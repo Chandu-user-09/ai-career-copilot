@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Learning Hub
+{% endblock %}
+
+{% block content %}
+
+<div class="learning-hub-page">
+
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    .learning-hub-page {
+        --bg-main: #0a0e1a;
+        --bg-card: #111a2e;
+        --bg-inner: #070b14;
+        
+        /* Specialized Neon Border Design Tokens */
+        --border-design: rgba(139, 92, 246, 0.3);
+        --border-design-hover: rgba(59, 130, 246, 0.8);
+        
+        /* Typography Colors */
+        --text-headline: #e2e8f0;
+        --text-subtle: #cbd5e1;
+        --text-muted: #64748b;
+        
+        /* Unified Premium Accents */
+        --accent-blue: #3b82f6;
+        --accent-purple: #8b5cf6;
+        --accent-glow: linear-gradient(135deg, #a78bfa, #60a5fa);
+        
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        letter-spacing: -0.01em;
+        background-color: var(--bg-main);
+        color: var(--text-headline);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Expanded width to occupy full page real estate natively */
+    .learning-hub-page .container-fluid { 
+        max-width: 1400px;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        margin-left: auto;
+        margin-right: auto;
+        flex-grow: 1;
+    }
+
+    /* Centered Typography Header */
+    .learning-hub-page .centered-header {
+        text-align: center;
+        padding: 60px 0 40px 0;
+    }
+
+    .learning-hub-page .centered-header h1 {
+        font-size: 36px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 12px;
+        background: var(--accent-glow);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .learning-hub-page .centered-header p {
+        font-size: 15px;
+        color: var(--text-muted);
+        max-width: 600px;
+        line-height: 1.6;
+        margin: 0 auto;
+        font-weight: 500;
+    }
+
+    /* Premium Full Border Accent Design Boxes */
+    .learning-hub-page .course-card {
+        background-color: var(--bg-card);
+        /* Applied consistent 1.5px border around the entire box */
+        border: 1.5px solid var(--border-design); 
+        border-radius: 14px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Animated Glowing Border Interaction - Entire Boundary Transforms */
+    .learning-hub-page .course-card:hover {
+        transform: translateY(-6px);
+        border-color: var(--border-design-hover);
+        box-shadow: 0 12px 30px rgba(59, 130, 246, 0.25), inset 0 0 15px rgba(59, 130, 246, 0.15);
+    }
+
+    /* Generous balanced padding to gracefully consume screen height */
+    .learning-hub-page .course-card .card-body {
+        padding: 2.2rem 1.75rem;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    /* Shrunken Icon Box Component */
+    .learning-hub-page .card-icon {
+        font-size: 22px;
+        margin-bottom: 16px;
+        background: rgba(255, 255, 255, 0.02);
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .learning-hub-page .course-card h4 {
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--text-subtle);
+        margin-bottom: 8px;
+        letter-spacing: -0.02em;
+    }
+
+    .learning-hub-page .course-card p {
+        color: var(--text-muted);
+        font-size: 13.5px;
+        line-height: 1.5;
+        margin-bottom: 24px;
+        flex-grow: 1;
+    }
+
+    /* Button Styling */
+    .learning-hub-page .btn-explore {
+        background-color: var(--bg-inner);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        color: #94a3b8;
+        font-weight: 600;
+        font-size: 13.5px;
+        border-radius: 8px;
+        padding: 10px 20px;
+        width: 100%;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .learning-hub-page .course-card:hover .btn-explore {
+        background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+        border-color: transparent;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .learning-hub-page * { transition: none !important; }
+    }
+</style>
+
+<div class="container-fluid mb-5">
+
+    <!-- Centered Header -->
+    <div class="centered-header">
+        <h1>🚀 AI Career Copilot Learning Hub</h1>
+        <p>
+            Select a specialized corporate tracking sequence below to review core framework architectures and begin your technical journey.
+        </p>
+    </div>
+
+    <!-- Wide View Content Track Grid -->
+    <div class="row g-4">
+
+        <!-- Track 1 -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card course-card h-100">
+                <div class="card-body text-center">
+                    <div class="card-icon">🎨</div>
+                    <h4>Frontend Developer</h4>
+                    <p>HTML, CSS, JavaScript, React</p>
+                    <a href="/learning/frontend-developer/" class="btn-explore">
+                        Explore Track
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Track 2 -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card course-card h-100">
+                <div class="card-body text-center">
+                    <div class="card-icon">☕</div>
+                    <h4>Backend (Java)</h4>
+                    <p>Java, Spring Boot Framework</p>
+                    <a href="/learning/backend-developer-java/" class="btn-explore">
+                        Explore Track
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Track 3 -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card course-card h-100">
+                <div class="card-body text-center">
+                    <div class="card-icon">🐍</div>
+                    <h4>Backend (Python)</h4>
+                    <p>Python Ecosystem, Django</p>
+                    <a href="/learning/backend-developer-python/" class="btn-explore">
+                        Explore Track
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Track 4 -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card course-card h-100">
+                <div class="card-body text-center">
+                    <div class="card-icon">🚀</div>
+                    <h4>Java Full Stack</h4>
+                    <p>Spring Boot Microservices + React</p>
+                    <a href="/learning/java-full-stack/" class="btn-explore">
+                        Explore Track
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Track 5 -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card course-card h-100">
+                <div class="card-body text-center">
+                    <div class="card-icon">⚡</div>
+                    <h4>Python Full Stack</h4>
+                    <p>Django Architecture + React</p>
+                    <a href="/learning/python-full-stack/" class="btn-explore">
+                        Explore Track
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Track 6 -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card course-card h-100">
+                <div class="card-body text-center">
+                    <div class="card-icon">🤖</div>
+                    <h4>AI & ML Engine</h4>
+                    <p>Machine Learning & GenAI Architectures</p>
+                    <a href="/learning/ai-ml/" class="btn-explore">
+                        Explore Track
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Track 7 -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card course-card h-100">
+                <div class="card-body text-center">
+                    <div class="card-icon">📊</div>
+                    <h4>Data Analytics</h4>
+                    <p>Advanced Excel, SQL, Power BI</p>
+                    <a href="/learning/data-analytics/" class="btn-explore">
+                        Explore Track
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Track 8 -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card course-card h-100">
+                <div class="card-body text-center">
+                    <div class="card-icon">📈</div>
+                    <h4>Data Science</h4>
+                    <p>Python, Predictive ML, Statistics</p>
+                    <a href="/learning/data-science/" class="btn-explore">
+                        Explore Track
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</div>
+
+{% endblock %}

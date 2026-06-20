@@ -1,0 +1,753 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ATS Resume Analyzer{% endblock %}
+
+{% block content %}
+<div id="ats-root" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0f172a; color: #f8fafc; min-height: 100vh; padding: 20px;">
+
+  <!-- ── UPLOAD SCREEN ── -->
+  <div id="uploadScreen" style="max-width: 800px; margin: 0 auto; padding-top: 40px;">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; color: #f8fafc;">ATS Resume Analyzer</h1>
+      <p style="color: #94a3b8; font-size: 1.1rem;">Upload your resume and optional job description to get instant AI analysis.</p>
+    </div>
+
+    <!-- Resume Input Card -->
+    <div style="background-color: #1e293b; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 24px;">
+      <label style="display: block; font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 12px;">Step 1: Resume Text or File</label>
+      
+      <div id="dropZone" style="border: 2px dashed #475569; border-radius: 8px; padding: 32px; text-align: center; cursor: pointer; background-color: #0f172a;"
+           onclick="document.getElementById('fileInput').click()"
+           ondragover="event.preventDefault(); this.style.borderColor = '#3b82f6';"
+           ondragleave="this.style.borderColor = '#475569';"
+           ondrop="handleDrop(event)">
+        <div style="font-size: 2rem; margin-bottom: 8px;">📄</div>
+        <div style="font-weight: 600; margin-bottom: 4px;">Drag and drop your resume here</div>
+        <div style="font-size: 0.875rem; color: #64748b; margin-bottom: 16px;">Supports PDF, DOCX, TXT</div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">Browse Files</button>
+        <input type="file" id="fileInput" accept=".pdf,.docx,.txt" style="display: none;" onchange="handleFile(event)">
+      </div>
+
+      <div id="filePill" style="display: none; margin-top: 12px;">
+        <span style="background-color: #1e1b4b; color: #a5b4fc; padding: 6px 12px; border-radius: 9999px; font-size: 0.875rem; display: inline-flex; align-items: center; border: 1px solid #312e81;">
+          📎 <span id="fileName" style="margin-left: 6px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
+          <button type="button" onclick="clearFile()" style="background: none; border: none; color: #ef4444; margin-left: 8px; font-weight: bold; cursor: pointer; padding: 0;">&times;</button>
+        </span>
+      </div>
+
+      <div style="margin-top: 16px; text-align: center; color: #64748b; font-size: 0.875rem; font-weight: 600;">— OR PASTE TEXT —</div>
+
+      <div style="margin-top: 16px;">
+        <textarea id="resumeText" rows="10" style="width: 100%; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px; color: #f8fafc; font-family: inherit; resize: vertical;" placeholder="Paste your full resume text here..."></textarea>
+      </div>
+    </div>
+
+    <!-- Job Description Card -->
+    <div style="background-color: #1e293b; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 32px;">
+      <label style="display: block; font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 12px;">Step 2: Job Description (Optional)</label>
+      <textarea id="jdText" rows="5" style="width: 100%; background-color: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px; color: #f8fafc; font-family: inherit; resize: vertical;" placeholder="Paste the target job description to verify missing keywords and alignment..."></textarea>
+    </div>
+
+    <div style="text-align: center;">
+      <button onclick="startAnalysis()" style="background: linear-gradient(to right, #3b82f6, #8b5cf6); border: none; color: white; padding: 14px 48px; font-size: 1.125rem; font-weight: 700; border-radius: 9999px; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);">Analyze Resume</button>
+    </div>
+  </div>
+
+  <!-- ── LOADING SCREEN ── -->
+  <div id="loadingScreen" style="display: none; max-width: 500px; margin: 100px auto 0 auto; text-align: center;">
+    <div style="border: 4px solid #1e293b; border-top: 4px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 24px auto;"></div>
+    <h3 id="loadingMsg" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">Parsing layout structure...</h3>
+    <p id="loadingSub" style="color: #64748b; font-size: 0.875rem; margin-bottom: 24px;">Extracting contextual text streams</p>
+    <div style="width: 100%; background-color: #1e293b; height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 32px;">
+      <div id="loadingBar" style="width: 0%; height: 100%; background-color: #3b82f6; transition: width 0.3s ease;"></div>
+    </div>
+    <div id="loadingSteps" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left; font-size: 0.875rem; color: #64748b; background-color: #1e293b; padding: 16px; border-radius: 8px;">
+      <div id="ls1">⬜ Parse Structure</div>
+      <div id="ls2">⬜ NLP Extraction</div>
+      <div id="ls3">⬜ ATS Scoring</div>
+      <div id="ls4">⬜ Keyword Analysis</div>
+      <div id="ls5">⬜ Role Matching</div>
+      <div id="ls6">⬜ Recommendations</div>
+    </div>
+  </div>
+
+  <!-- ── RESULTS SCREEN ── -->
+  <div id="resultsScreen" style="display: none; max-width: 1200px; margin: 0 auto;">
+    <!-- Navigation Tabs -->
+    <div style="display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid #334155; padding-bottom: 12px; flex-wrap: wrap;">
+      <button class="ats-tab active" onclick="switchTab('overview', this)" style="background: none; border: none; color: #f8fafc; padding: 8px 16px; font-weight: 600; cursor: pointer; border-radius: 6px;">Overview</button>
+      <button class="ats-tab" onclick="switchTab('skills', this)" style="background: none; border: none; color: #94a3b8; padding: 8px 16px; font-weight: 600; cursor: pointer; border-radius: 6px;">Skills Mapping</button>
+      <button class="ats-tab" onclick="switchTab('projects', this)" style="background: none; border: none; color: #94a3b8; padding: 8px 16px; font-weight: 600; cursor: pointer; border-radius: 6px;">Project Assessment</button>
+      <button class="ats-tab" onclick="switchTab('match', this)" style="background: none; border: none; color: #94a3b8; padding: 8px 16px; font-weight: 600; cursor: pointer; border-radius: 6px;">Role Alignment</button>
+      <button class="ats-tab" onclick="switchTab('improve', this)" style="background: none; border: none; color: #94a3b8; padding: 8px 16px; font-weight: 600; cursor: pointer; border-radius: 6px;">Roadmap</button>
+      <button onclick="resetApp()" style="margin-left: auto; background-color: #334155; border: none; color: #f8fafc; padding: 6px 12px; border-radius: 6px; font-size: 0.875rem; font-weight: 600; cursor: pointer;">New Analysis</button>
+    </div>
+
+    <!-- OVERVIEW TAB -->
+    <div id="tab-overview" class="ats-tab-content">
+      <div id="profileBanner" style="margin-bottom: 24px;"></div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+        <!-- Gauge score metric -->
+        <div style="background-color: #1e293b; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <h3 style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 16px; width: 100%;">Overall ATS Match</h3>
+          <div style="position: relative; width: 160px; height: 160px;">
+            <canvas id="gaugeCanvas" width="160" height="160"></canvas>
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+              <span id="scoreNum" style="font-size: 2.5rem; font-weight: 800; color: #f8fafc; line-height: 1;">0</span>
+              <span style="font-size: 0.75rem; color: #64748b; font-weight: 600; margin-top: 4px;">SCORE</span>
+            </div>
+          </div>
+          <div id="verdictPill" style="margin-top: 16px;"></div>
+          <div style="display: flex; justify-content: space-around; width: 100%; margin-top: 24px; border-top: 1px solid #334155; padding-top: 16px; text-align: center;">
+            <div>
+              <div id="recRating" style="font-size: 1.25rem; font-weight: 700;">-/10</div>
+              <div style="font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Recruiter Rating</div>
+            </div>
+            <div>
+              <div id="strengthLvl" style="font-size: 1.25rem; font-weight: 700; color: #10b981;">-</div>
+              <div style="font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Profile Strength</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Breakdown metrics -->
+        <div style="background-color: #1e293b; border-radius: 12px; padding: 24px;">
+          <h3 style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 16px;">Score Weights Matrix</h3>
+          <div id="scoreBreakdown" style="display: flex; flex-direction: column; gap: 14px;"></div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+        <div style="background-color: #1e293b; border-radius: 12px; padding: 24px;">
+          <h3 style="font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #10b981; margin-bottom: 12px;">Core Strengths</h3>
+          <div id="strengthsList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+        <div style="background-color: #1e293b; border-radius: 12px; padding: 24px;">
+          <h3 style="font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #f43f5e; margin-bottom: 12px;">Critical Weaknesses</h3>
+          <div id="weaknessesList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+        <div style="background-color: #1e293b; border-radius: 12px; padding: 24px;">
+          <h3 style="font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 12px;">Verdict & Validation</h3>
+          <div id="verdictSection"></div>
+        </div>
+      </div>
+
+      <div style="background-color: #1e293b; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <h3 style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 16px;">Job Role Profile Alignment Summary</h3>
+        <div id="roleOverview" style="display: flex; flex-direction: column; gap: 12px;"></div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div style="background-color: #1e293b; border-radius: 12px; padding: 24px;">
+          <h3 style="font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #10b981; margin-bottom: 12px;">Keywords Found</h3>
+          <div id="kwFound" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+        </div>
+        <div style="background-color: #1e293b; border-radius: 12px; padding: 24px;">
+          <h3 style="font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #f43f5e; margin-bottom: 12px;">Missing Target Keywords</h3>
+          <div id="kwMissing" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SKILLS TAB -->
+    <div id="tab-skills" class="ats-tab-content" style="display: none;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+        <div style="background-color: #1e293b; border-radius: 12px; padding: 24px; height: 300px; position: relative;">
+          <h3 style="font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 12px;">Skills Distribution</h3>
+          <canvas id="radarChart"></canvas>
+        </div>
+        <div style="background-color: #1e293b; border-radius: 12px; padding: 24px; height: 300px; position: relative;">
+          <h3 style="font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 12px;">Volume Matrix Categories</h3>
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+      <div id="skillsGrid"></div>
+    </div>
+
+    <!-- PROJECTS TAB -->
+    <div id="tab-projects" class="ats-tab-content" style="display: none;">
+      <div id="projectsContent"></div>
+    </div>
+
+    <!-- JOB MATCH TAB -->
+    <div id="tab-match" class="ats-tab-content" style="display: none;">
+      <div style="background-color: #1e293b; border-radius: 12px; padding: 24px; margin-bottom: 24px; height: 360px; position: relative;">
+        <h3 style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 16px;">Core Job Domain Overlaps</h3>
+        <canvas id="roleChart"></canvas>
+      </div>
+      <div id="roleDetails"></div>
+    </div>
+
+    <!-- IMPROVEMENTS TAB -->
+    <div id="tab-improve" class="ats-tab-content" style="display: none;">
+      <div style="background-color: #1e293b; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <h3 style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 16px;">Top 15 Strategic Improvement Steps</h3>
+        <div id="improvementList" style="display: flex; flex-direction: column; gap: 12px;"></div>
+      </div>
+      <div style="background-color: #1e293b; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <h3 style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 16px;">Optimized AI Summary Injection</h3>
+        <div id="optimizedSummary"></div>
+      </div>
+      <div style="background-color: #1e293b; border-radius: 12px; padding: 24px;">
+        <h3 style="font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 16px;">Experience Rewrites (STAR Impact Vectors)</h3>
+        <div id="rewrittenExp"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<style>
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  .ats-tab.active { background-color: #334155 !important; color: #f8fafc !important; }
+  .ats-bar-fill { height: 100%; border-radius: 9999px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+  .kw-found { background-color: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 10px; border-radius: 6px; font-size: 0.8125rem; font-weight: 500; }
+  .kw-missing { background-color: rgba(244, 63, 94, 0.1); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.2); padding: 4px 10px; border-radius: 6px; font-size: 0.8125rem; font-weight: 500; }
+  .skill-tag { padding: 4px 10px; border-radius: 6px; font-size: 0.8125rem; font-weight: 500; display: inline-block; }
+  .skill-found { background-color: #334155; color: #e2e8f0; border: 1px solid #475569; }
+  .skill-missing { background-color: rgba(244, 63, 94, 0.1); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.2); }
+  .skill-suggest { background-color: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); padding: 4px 10px; border-radius: 6px; font-size: 0.8125rem; font-weight: 500; }
+  .ats-role-row { display: flex; align-items: center; gap: 16px; }
+</style>
+
+<script>
+// ── Application Core Architecture ───────────────────────────────────────────
+const APP_STATE = {
+  resumeText: "",
+  jdText: "",
+  data: null,
+  activeCharts: {}
+};
+
+let statusTimer = null;
+
+// ── Drop and Drag Events Validation ─────────────────────────────────────────
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').style.borderColor = '#475569';
+  const file = e.dataTransfer.files[0];
+  if (file) handleIncomingFile(file);
+}
+
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (file) handleIncomingFile(file);
+}
+
+function handleIncomingFile(file) {
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('filePill').style.display = 'block';
+  APP_STATE.resumeText = ""; 
+}
+
+function clearFile() {
+  APP_STATE.resumeText = "";
+  document.getElementById('filePill').style.display = 'none';
+  document.getElementById('fileInput').value = "";
+}
+
+// ── Processing Loading Automation Steps ────────────────────────────────────
+const stepSequences = [
+  ["Parsing structural layers...", "Extracting contextual typography models"],
+  ["Executing dynamic NLP pipelines...", "Tagging architectural semantic frames"],
+  ["Calculating systemic ATS weights...", "Mapping dimension profile matches"],
+  ["Running targeted keyword evaluations...", "Computing frequency parameters"],
+  ["Aligning role compatibility indices...", "Matching domain distribution maps"],
+  ["Assembling optimization roadmap...", "Formatting engineering interventions"]
+];
+
+function triggerStateProgress() {
+  let counter = 0;
+  const bar = document.getElementById('loadingBar');
+  statusTimer = setInterval(() => {
+    if (counter < stepSequences.length) {
+      document.getElementById('loadingMsg').textContent = stepSequences[counter][0];
+      document.getElementById('loadingSub').textContent = stepSequences[counter][1];
+      bar.style.width = `${((counter + 1) / stepSequences.length) * 100}%`;
+      const stepElement = document.getElementById(`ls${counter + 1}`);
+      if (stepElement) stepElement.textContent = "✅ " + stepElement.textContent.substring(2);
+      counter++;
+    }
+  }, 1600);
+}
+
+// ── Submission Dispatch Engine ──────────────────────────────────────────────
+async function startAnalysis() {
+  const pasteVal = document.getElementById('resumeText').value.trim();
+  const jdVal = document.getElementById('jdText').value.trim();
+  const fileInputObj = document.getElementById('fileInput').files[0];
+
+  if (!pasteVal && !fileInputObj) {
+    alert("Please inject resume content using text serialization or form file uploads.");
+    return;
+  }
+
+  APP_STATE.resumeText = pasteVal;
+  APP_STATE.jdText = jdVal;
+
+  document.getElementById('uploadScreen').style.display = 'none';
+  document.getElementById('loadingScreen').style.display = 'block';
+  triggerStateProgress();
+
+  try {
+    const token = getCookie('csrftoken');
+    const multiForm = new FormData();
+    multiForm.append('jdText', jdVal);
+    
+    if (pasteVal) multiForm.append('resumeText', pasteVal);
+    if (fileInputObj) multiForm.append('resumeFile', fileInputObj);
+
+    const callResult = await fetch('/resume/analyzer/analyze/', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': token },
+      body: multiForm
+    });
+
+    const parsedRes = await callResult.json();
+    clearInterval(statusTimer);
+
+    if (!parsedRes.success) throw new Error(parsedRes.error || "System failure within analysis models.");
+
+    APP_STATE.data = parsedRes.data;
+    renderTargetData(APP_STATE.data);
+
+  } catch (err) {
+    clearInterval(statusTimer);
+    document.getElementById('loadingScreen').innerHTML = `
+      <div style="text-align: center; padding: 40px 0;">
+        <div style="background-color: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.2); padding: 16px; border-radius: 8px; color: #fb7185; display: inline-block; text-align: left; max-width: 450px;">
+          <h4 style="margin: 0 0 8px 0; font-weight: 700;">Extraction Exception Context</h4>
+          <p style="margin: 0; font-size: 0.875rem;">${err.message}</p>
+        </div>
+        <div style="margin-top: 24px;"><button onclick="resetApp()" class="btn btn-secondary">Return to Dashboard</button></div>
+      </div>`;
+  }
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+// ── Navigation Tab Systems ──────────────────────────────────────────────────
+function switchTab(tabId, buttonEl) {
+  document.querySelectorAll('.ats-tab').forEach(b => {
+    b.classList.remove('active');
+    b.style.color = '#94a3b8';
+  });
+  document.querySelectorAll('.ats-tab-content').forEach(c => c.style.display = 'none');
+  
+  buttonEl.classList.add('active');
+  buttonEl.style.color = '#f8fafc';
+  document.getElementById(`tab-${tabId}`).style.display = 'block';
+
+  if (tabId === 'skills') setTimeout(initializeVisualAnalytics, 50);
+  if (tabId === 'match') setTimeout(initializeRoleOverlapChart, 50);
+}
+
+// ── State Recovery Realignment ──────────────────────────────────────────────
+function resetApp() {
+  APP_STATE.data = null;
+  APP_STATE.resumeText = "";
+  APP_STATE.jdText = "";
+  
+  Object.values(APP_STATE.activeCharts).forEach(chart => {
+    try { chart.destroy(); } catch (e) {}
+  });
+  APP_STATE.activeCharts = {};
+
+  document.getElementById('uploadScreen').style.display = 'block';
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('resultsScreen').style.display = 'none';
+  document.getElementById('resumeText').value = "";
+  document.getElementById('jdText').value = "";
+  clearFile();
+
+  // Re-render empty placeholder layers to step markers
+  document.getElementById('loadingScreen').innerHTML = `
+    <div style="border: 4px solid #1e293b; border-top: 4px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 24px auto;"></div>
+    <h3 id="loadingMsg" style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">Parsing layout structure...</h3>
+    <p id="loadingSub" style="color: #64748b; font-size: 0.875rem; margin-bottom: 24px;">Extracting contextual text streams</p>
+    <div style="width: 100%; background-color: #1e293b; height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 32px;">
+      <div id="loadingBar" style="width: 0%; height: 100%; background-color: #3b82f6; transition: width 0.3s ease;"></div>
+    </div>
+    <div id="loadingSteps" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left; font-size: 0.875rem; color: #64748b; background-color: #1e293b; padding: 16px; border-radius: 8px;">
+      <div id="ls1">⬜ Parse Structure</div>
+      <div id="ls2">⬜ NLP Extraction</div>
+      <div id="ls3">⬜ ATS Scoring</div>
+      <div id="ls4">⬜ Keyword Analysis</div>
+      <div id="ls5">⬜ Role Matching</div>
+      <div id="ls6">⬜ Recommendations</div>
+    </div>`;
+}
+
+// ── Presentation Engine Renderers ───────────────────────────────────────────
+function renderTargetData(payload) {
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('resultsScreen').style.display = 'block';
+
+  renderOverviewTab(payload);
+  renderSkillsTab(payload);
+  renderProjectsTab(payload);
+  renderImprovementsTab(payload);
+}
+
+function computeScoreColor(score) {
+  if (score >= 85) return '#10b981';
+  if (score >= 70) return '#3b82f6';
+  if (score >= 50) return '#f59e0b';
+  return '#ef4444';
+}
+
+function processGaugeRender(targetId, scoreValue) {
+  const canvas = document.getElementById(targetId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const accent = computeScoreColor(scoreValue);
+  
+  ctx.clearRect(0, 0, 160, 160);
+  
+  // Base circle path
+  ctx.beginPath();
+  ctx.arc(80, 80, 68, Math.PI * 0.8, Math.PI * 2.2);
+  ctx.strokeStyle = '#334155';
+  ctx.lineWidth = 10;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // Dynamic values fill path
+  ctx.beginPath();
+  ctx.arc(80, 80, 68, Math.PI * 0.8, Math.PI * 0.8 + (Math.PI * 1.4 * (scoreValue / 100)));
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 10;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+}
+
+function renderOverviewTab(d) {
+  const profile = d.profile;
+  let contactString = "";
+  if (profile.email) contactString += `<span style="margin-right: 16px;">📧 ${profile.email}</span>`;
+  if (profile.phone) contactString += `<span style="margin-right: 16px;">📱 ${profile.phone}</span>`;
+  if (profile.linkedin) contactString += `<span style="margin-right: 16px;">🔗 LinkedIn</span>`;
+  if (profile.github) contactString += `<span>💻 GitHub</span>`;
+
+  document.getElementById('profileBanner').innerHTML = `
+    <div style="background-color: #1e293b; border-radius: 12px; padding: 24px; position: relative;">
+      <h2 style="font-size: 1.75rem; font-weight: 800; margin: 0 0 4px 0;">${profile.name || "Candidate Profile Info"}</h2>
+      <div style="font-weight: 600; color: #3b82f6; font-size: 0.9375rem; margin-bottom: 12px;">${profile.level} Execution Frame · ${d.strengthLevel}</div>
+      <div style="color: #94a3b8; font-size: 0.875rem; display: flex; flex-wrap: wrap; margin-bottom: 16px;">${contactString}</div>
+      <p style="margin: 0; color: #cbd5e1; font-size: 0.9375rem; line-height: 1.6; border-top: 1px solid #334155; padding-top: 14px;">${profile.summary || ""}</p>
+    </div>`;
+
+  setTimeout(() => processGaugeRender('gaugeCanvas', d.scores.overall), 40);
+  document.getElementById('scoreNum').textContent = d.scores.overall;
+
+  const styleMappings = {
+    "Strong Shortlist": "background-color: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3);",
+    "Shortlist": "background-color: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3);",
+    "Consider": "background-color: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3);",
+    "Reject": "background-color: rgba(244,63,94,0.15); color: #fb7185; border: 1px solid rgba(244,63,94,0.3);",
+    "Strong Reject": "background-color: rgba(225,29,72,0.2); color: #fda4af; border: 1px solid #f43f5e;"
+  };
+
+  const pillCSS = styleMappings[d.verdict] || "background-color: #334155; color: #f8fafc;";
+  document.getElementById('verdictPill').innerHTML = `<span style="${pillCSS} padding: 4px 14px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${d.verdict}</span>`;
+  
+  document.getElementById('recRating').textContent = `${d.recruiterRating}/10`;
+  document.getElementById('strengthLvl').textContent = d.strengthLevel;
+
+  const metricsArr = [
+    { target: "keywordMatch", label: "Keyword Match" },
+    { target: "skillsMatch", label: "Skills Structure" },
+    { target: "experienceQuality", label: "Experience Weight" },
+    { target: "education", label: "Education Logic" },
+    { target: "projectQuality", label: "Project Vectors" },
+    { target: "resumeFormat", label: "Structural Format" },
+    { target: "readability", label: "NLP Readability" }
+  ];
+
+  document.getElementById('scoreBreakdown').innerHTML = metricsArr.map(item => {
+    const val = d.scores[item.target];
+    const col = computeScoreColor(val);
+    return `
+      <div class="ats-role-row">
+        <div style="width: 140px; font-size: 0.875rem; color: #cbd5e1; font-weight: 500;">${item.label}</div>
+        <div style="flex: 1; background-color: #0f172a; height: 8px; border-radius: 9999px; overflow: hidden;">
+          <div class="ats-bar-fill" style="width: ${val}%; background-color: ${col};"></div>
+        </div>
+        <div style="width: 32px; text-align: right; font-size: 0.875rem; font-weight: 700; color: ${col}">${val}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('strengthsList').innerHTML = d.strengths.map(str => `<div style="background-color: #0f172a; border-radius: 8px; padding: 10px 12px; font-size: 0.875rem; border-left: 4px solid #10b981;">${str}</div>`).join('');
+  document.getElementById('weaknessesList').innerHTML = d.weaknesses.map(weak => `<div style="background-color: #0f172a; border-radius: 8px; padding: 10px 12px; font-size: 0.875rem; border-left: 4px solid #f43f5e;">${weak}</div>`).join('');
+
+  document.getElementById('verdictSection').innerHTML = `
+    <div style="font-size: 0.875rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px;">${d.verdictReason || ""}</div>
+    <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 6px;">Target Certifications</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 4px;">${(d.certificationsSuggested || []).map(cert => `<span class="skill-suggest">${cert}</span>`).join('')}</div>`;
+
+  const friendlyNames = {
+    dataAnalyst: "Data Analyst",
+    dataScientist: "Data Scientist",
+    businessAnalyst: "Business Analyst",
+    pythonDeveloper: "Python Developer",
+    cloudEngineer: "Cloud Engineer",
+    mlEngineer: "Machine Learning Eng",
+    softwareEngineer: "Software Engineer"
+  };
+
+  document.getElementById('roleOverview').innerHTML = Object.keys(d.roleMatch).map(key => {
+    const score = d.roleMatch[key];
+    const barCol = computeScoreColor(score);
+    return `
+      <div class="ats-role-row">
+        <div style="width: 160px; font-size: 0.875rem; color: #cbd5e1; font-weight: 600;">${friendlyNames[key] || key}</div>
+        <div style="flex: 1; background-color: #0f172a; height: 8px; border-radius: 9999px; overflow: hidden;">
+          <div class="ats-bar-fill" style="width: ${score}%; background-color: ${barCol};"></div>
+        </div>
+        <div style="width: 40px; text-align: right; font-size: 0.875rem; font-weight: 700; color: ${barCol}">${score}%</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('kwFound').innerHTML = (d.keywordsFound || []).map(kw => `<span class="kw-found">${kw}</span>`).join('');
+  document.getElementById('kwMissing').innerHTML = (d.keywordsMissing || []).map(kw => `<span class="kw-missing">${kw}</span>`).join('');
+}
+
+// ── Skills Mapping Matrix ───────────────────────────────────────────────────
+function initializeVisualAnalytics() {
+  if (!APP_STATE.data) return;
+  const targetData = APP_STATE.data.skills;
+  const axesLabels = ["Programming", "Databases", "Cloud Systems", "Data Science", "BI/Analytics", "Frameworks", "DevOps Tools"];
+  const matrixWeights = [
+    targetData.programmingLanguages.length,
+    targetData.databases.length,
+    targetData.cloudTechnologies.length,
+    targetData.dataScience.length,
+    targetData.biAnalytics.length,
+    targetData.frameworks.length,
+    targetData.devops.length
+  ];
+
+  if (APP_STATE.activeCharts.radar) APP_STATE.activeCharts.radar.destroy();
+  if (APP_STATE.activeCharts.bar) APP_STATE.activeCharts.bar.destroy();
+
+  APP_STATE.activeCharts.radar = new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels: axesLabels,
+      datasets: [{
+        label: 'Weight Density',
+        data: matrixWeights.map(v => Math.min(v * 15, 100)),
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+        borderColor: '#3b82f6',
+        pointBackgroundColor: '#60a5fa'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          grid: { color: '#334155' },
+          angleLines: { color: '#334155' },
+          pointLabels: { color: '#94a3b8', font: { weight: 600 } },
+          ticks: { display: false, maxTicksLimit: 4 }
+        }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  APP_STATE.activeCharts.bar = new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels: axesLabels,
+      datasets: [{
+        data: matrixWeights,
+        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#38bdf8', '#a855f7']
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#64748b' } },
+        y: { grid: { color: '#334155' }, ticks: { color: '#64748b', stepSize: 1 } }
+      }
+    }
+  });
+}
+
+function renderSkillsTab(d) {
+  const sk = d.skills;
+  const segmentDef = [
+    { header: "Programming Languages", dataKey: "programmingLanguages" },
+    { header: "Databases & Storage", dataKey: "databases" },
+    { header: "Cloud Infrastructure", dataKey: "cloudTechnologies" },
+    { header: "Data Science & Learning Systems", dataKey: "dataScience" },
+    { header: "BI / Analytical Layers", dataKey: "biAnalytics" },
+    { header: "Frameworks & Engine Components", dataKey: "frameworks" },
+    { header: "DevOps Architecture & Utilities", dataKey: "devops" },
+    { header: "Soft Skills Context", dataKey: "softSkills" }
+  ];
+
+  document.getElementById('skillsGrid').innerHTML = `
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+      ${segmentDef.map(cat => `
+        <div style="background-color: #1e293b; border-radius: 12px; padding: 20px;">
+          <h4 style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 12px;">${cat.header}</h4>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            ${(sk[cat.dataKey] || []).map(val => `<span class="skill-tag skill-found">${val}</span>`).join('') || '<span style="color: #475569; font-size: 0.875rem;">None verified</span>'}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+      <div style="background-color: #1e293b; border-radius: 12px; padding: 24px;">
+        <h3 style="font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #f43f5e; margin-bottom: 12px;">Missing Core Domain Competencies</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">${(d.missingSkills || []).map(s => `<span class="skill-tag skill-missing">${s}</span>`).join('')}</div>
+      </div>
+      <div style="background-color: #1e293b; border-radius: 12px; padding: 24px;">
+        <h3 style="font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #3b82f6; margin-bottom: 12px;">High Demand Additions Suggested</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">${(d.suggestedSkills || []).map(s => `<span class="skill-tag skill-suggest">${s}</span>`).join('')}</div>
+      </div>
+    </div>`;
+}
+
+// ── Project Assessment Grid ─────────────────────────────────────────────────
+function renderProjectsTab(d) {
+  if (!d.projects || d.projects.length === 0) {
+    document.getElementById('projectsContent').innerHTML = `
+      <div style="background-color: #1e293b; border-radius: 12px; padding: 48px; text-align: center; color: #64748b;">
+        No clear functional project entities isolated inside document text tracks.
+      </div>`;
+    return;
+  }
+
+  document.getElementById('projectsContent').innerHTML = d.projects.map((proj, idx) => `
+    <div style="background-color: #1e293b; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+        <div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; margin: 0 0 6px 0;">${proj.name || "Project Entity Mapping"}</h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 4px;">${(proj.techStack || []).map(t => `<span class="skill-tag skill-found">${t}</span>`).join('')}</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 1.75rem; font-weight: 800; color: ${computeScoreColor(proj.rating * 10)}; line-height: 1;">${proj.rating}</div>
+          <span style="font-size: 0.6875rem; color: #64748b; font-weight: 700; text-transform: uppercase;">INDEX VALUE</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; text-align: center;">
+        <div style="background-color: #0f172a; padding: 12px; border-radius: 8px;">
+          <div style="font-size: 1.125rem; font-weight: 700; color: ${computeScoreColor(proj.complexity * 10)};">${proj.complexity}/10</div>
+          <div style="font-size: 0.6875rem; color: #64748b; font-weight: 600; text-transform: uppercase; margin-top: 2px;">Complexity</div>
+        </div>
+        <div style="background-color: #0f172a; padding: 12px; border-radius: 8px;">
+          <div style="font-size: 1.125rem; font-weight: 700; color: ${computeScoreColor(proj.businessImpact * 10)};">${proj.businessImpact}/10</div>
+          <div style="font-size: 0.6875rem; color: #64748b; font-weight: 600; text-transform: uppercase; margin-top: 2px;">Business Impact</div>
+        </div>
+        <div style="background-color: #0f172a; padding: 12px; border-radius: 8px;">
+          <div style="font-size: 1.125rem; font-weight: 700; color: ${computeScoreColor(proj.resumeValue * 10)};">${proj.resumeValue}/10</div>
+          <div style="font-size: 0.6875rem; color: #64748b; font-weight: 600; text-transform: uppercase; margin-top: 2px;">Resume Value</div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 0.875rem;">
+        <div>
+          <div style="font-weight: 700; color: #f43f5e; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Identified Structural Deficits</div>
+          <div style="background-color: rgba(244,63,94,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(244,63,94,0.1); color: #cbd5e1;">${proj.improvement}</div>
+        </div>
+        <div>
+          <div style="font-weight: 700; color: #10b981; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">AI STAR Model Rewrite Transformation</div>
+          <div style="background-color: rgba(16,185,129,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(16,185,129,0.1); color: #86efac; font-style: italic;">"${proj.rewrite}"</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Role Alignment Matrix ───────────────────────────────────────────────────
+function initializeRoleOverlapChart() {
+  if (!APP_STATE.data) return;
+  const metrics = APP_STATE.data.roleMatch;
+  const conversionNames = {
+    dataAnalyst: "Data Analyst",
+    dataScientist: "Data Scientist",
+    businessAnalyst: "Business Analyst",
+    pythonDeveloper: "Python Developer",
+    cloudEngineer: "Cloud Engineer",
+    mlEngineer: "Machine Learning Engineer",
+    softwareEngineer: "Software Engineer"
+  };
+
+  const mapKeys = Object.keys(metrics);
+  if (APP_STATE.activeCharts.role) APP_STATE.activeCharts.role.destroy();
+
+  APP_STATE.activeCharts.role = new Chart(document.getElementById('roleChart'), {
+    type: 'bar',
+    data: {
+      labels: mapKeys.map(k => conversionNames[k] || k),
+      datasets: [{
+        data: mapKeys.map(k => metrics[k]),
+        backgroundColor: mapKeys.map(k => computeScoreColor(metrics[k])),
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { min: 0, max: 100, grid: { color: '#334155' }, ticks: { color: '#64748b', callback: v => v + '%' } },
+        y: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { weight: 600 } } }
+      }
+    }
+  });
+
+  document.getElementById('roleDetails').innerHTML = mapKeys.map(k => `
+    <div style="background-color: #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <h4 style="font-size: 1.125rem; font-weight: 700; margin: 0;">${conversionNames[k] || k} Alignment Context</h4>
+        <span style="font-size: 1.125rem; font-weight: 800; color: ${computeScoreColor(metrics[k])}">${metrics[k]}% Match</span>
+      </div>
+      <p style="margin: 0; font-size: 0.875rem; color: #94a3b8; line-height: 1.5;">Calculated checking tech stack profiles, project semantic patterns, and historical position metrics relevant to domain target architectures.</p>
+    </div>`).join('');
+}
+
+// ── Strategic Improvement Layer ─────────────────────────────────────────────
+function renderImprovementsTab(d) {
+  document.getElementById('improvementList').innerHTML = (d.improvements || []).map((step, index) => `
+    <div style="display: flex; gap: 14px; background-color: #0f172a; padding: 14px; border-radius: 8px; border-left: 3px solid #8b5cf6;">
+      <span style="background-color: #312e81; color: #c084fc; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8125rem; font-weight: 700; flex-shrink: 0;">${index + 1}</span>
+      <span style="font-size: 0.9375rem; color: #cbd5e1; line-height: 1.5;">${step}</span>
+    </div>`).join('');
+
+  document.getElementById('optimizedSummary').innerHTML = `
+    <div style="background-color: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.15); border-radius: 8px; padding: 16px; font-size: 0.9375rem; line-height: 1.6; color: #e2e8f0; font-style: italic;">
+      "${d.optimizedSummary || "Summary transformation processing baseline dropped."}"
+    </div>`;
+
+  document.getElementById('rewrittenExp').innerHTML = `
+    <div style="background-color: #0f172a; border-radius: 8px; padding: 16px; font-size: 0.875rem; color: #94a3b8; line-height: 1.6;">
+      Framework references extracted map directly to isolated project blocks. Use the rewrites in your specific chronology tables matching core timeline indicators.
+    </div>`;
+}
+</script>
+{% endblock %}

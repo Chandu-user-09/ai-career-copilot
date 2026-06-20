@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ course_name }} Quiz</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+    :root{
+        --bg:#0b0c14;
+        --bg-soft:#11131f;
+        --card:#161826;
+        --line:#262a3d;
+        --ink:#eef0fb;
+        --muted:#8a8da3;
+        --indigo:#6c63ff;
+        --indigo-deep:#4f46e5;
+        --indigo-soft:#2a2660;
+        --amber:#f5a524;
+        --amber-soft:#3a2c10;
+        --easy:#2bb673;
+        --medium:#f5a524;
+        --hard:#ef4a48;
+    }
+
+    *{
+        box-sizing:border-box;
+    }
+
+    body{
+        margin:0;
+        background:
+            radial-gradient(900px 500px at 85% -10%, rgba(108,99,255,0.16), transparent 60%),
+            radial-gradient(700px 400px at 5% 100%, rgba(245,165,36,0.06), transparent 60%),
+            var(--bg);
+        font-family:'Inter', sans-serif;
+        color:var(--ink);
+        -webkit-font-smoothing:antialiased;
+    }
+
+    .wrap{
+        max-width:760px;
+        margin:0 auto;
+        padding:48px 24px 80px;
+    }
+
+    /* ---------- HERO ---------- */
+
+    .hero{
+        position:relative;
+        background:linear-gradient(160deg, #1a1640 0%, #110f30 70%, #0b0c14 100%);
+        border:1px solid var(--line);
+        color:#fff;
+        border-radius:24px;
+        padding:44px 40px;
+        overflow:hidden;
+        isolation:isolate;
+    }
+
+    .hero::before{
+        content:"";
+        position:absolute;
+        inset:0;
+        background:
+            radial-gradient(circle at 88% 18%, rgba(245,165,36,0.22), transparent 45%),
+            repeating-linear-gradient(135deg, rgba(255,255,255,0.025) 0 2px, transparent 2px 26px);
+        z-index:-1;
+    }
+
+    .eyebrow{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        font-family:'Sora', sans-serif;
+        font-size:12px;
+        font-weight:700;
+        letter-spacing:.14em;
+        text-transform:uppercase;
+        color:#ffd9a0;
+        background:rgba(245,165,36,0.14);
+        border:1px solid rgba(245,165,36,0.35);
+        padding:6px 14px;
+        border-radius:999px;
+    }
+
+    .hero h1{
+        font-family:'Sora', sans-serif;
+        font-size:clamp(28px, 4vw, 38px);
+        font-weight:800;
+        line-height:1.15;
+        margin:18px 0 8px;
+        letter-spacing:-0.01em;
+        color:var(--ink);
+    }
+
+    .hero p{
+        margin:0;
+        font-size:15.5px;
+        color:var(--muted);
+        max-width:480px;
+    }
+
+    /* ---------- CARD ---------- */
+
+    .panel{
+        background:var(--card);
+        border:1px solid var(--line);
+        border-radius:22px;
+        margin-top:28px;
+        padding:40px;
+        box-shadow:0 30px 60px -30px rgba(0,0,0,0.6);
+    }
+
+    .step{
+        display:flex;
+        align-items:baseline;
+        gap:12px;
+        margin-bottom:6px;
+    }
+
+    .step-num{
+        font-family:'Sora', sans-serif;
+        font-size:12px;
+        font-weight:700;
+        color:#b3aeff;
+        background:var(--indigo-soft);
+        border-radius:999px;
+        width:24px;
+        height:24px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        flex-shrink:0;
+    }
+
+    .step h3{
+        font-family:'Sora', sans-serif;
+        font-size:18px;
+        font-weight:700;
+        margin:0;
+        color:var(--ink);
+    }
+
+    .step-sub{
+        margin:0 0 22px 36px;
+        font-size:13.5px;
+        color:var(--muted);
+    }
+
+    /* ---------- DIFFICULTY CARDS ---------- */
+
+    .diff-grid{
+        display:grid;
+        grid-template-columns:repeat(3, 1fr);
+        gap:14px;
+        margin:0 0 36px 0;
+    }
+
+    .diff-card{
+        position:relative;
+        border:1.5px solid var(--line);
+        border-radius:16px;
+        padding:18px 16px 16px;
+        cursor:pointer;
+        background:var(--bg-soft);
+        text-align:left;
+        transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+        font-family:inherit;
+    }
+
+    .diff-card:hover{
+        transform:translateY(-2px);
+        border-color:#3a3f5c;
+    }
+
+    .diff-card .dot{
+        width:10px;
+        height:10px;
+        border-radius:50%;
+        display:inline-block;
+        margin-bottom:10px;
+    }
+
+    .diff-card[data-val="easy"] .dot{ background:var(--easy); }
+    .diff-card[data-val="medium"] .dot{ background:var(--medium); }
+    .diff-card[data-val="hard"] .dot{ background:var(--hard); }
+
+    .diff-card .label{
+        display:block;
+        font-family:'Sora', sans-serif;
+        font-weight:700;
+        font-size:15.5px;
+        margin-bottom:3px;
+        color:var(--ink);
+    }
+
+    .diff-card .desc{
+        display:block;
+        font-size:12.5px;
+        color:var(--muted);
+        line-height:1.4;
+    }
+
+    .diff-card.selected{
+        border-color:var(--indigo);
+        background:rgba(108,99,255,0.08);
+        box-shadow:0 0 0 3px rgba(108,99,255,0.14);
+    }
+
+    .diff-card.selected::after{
+        content:"✓";
+        position:absolute;
+        top:14px;
+        right:14px;
+        width:20px;
+        height:20px;
+        background:var(--indigo);
+        color:#fff;
+        font-size:11px;
+        font-weight:700;
+        border-radius:50%;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+
+    /* ---------- QUESTION COUNT ---------- */
+
+    .num-grid{
+        display:grid;
+        grid-template-columns:repeat(4, 1fr);
+        gap:12px;
+        margin:0 0 8px 0;
+    }
+
+    .num-card{
+        border:1.5px solid var(--line);
+        border-radius:14px;
+        padding:16px 8px;
+        text-align:center;
+        cursor:pointer;
+        background:var(--bg-soft);
+        font-family:'Sora', sans-serif;
+        transition:border-color .15s ease, transform .15s ease;
+    }
+
+    .num-card:hover{
+        transform:translateY(-2px);
+        border-color:#3a3f5c;
+    }
+
+    .num-card .n{
+        display:block;
+        font-size:22px;
+        font-weight:800;
+        color:var(--ink);
+    }
+
+    .num-card .t{
+        display:block;
+        font-size:11px;
+        color:var(--muted);
+        margin-top:2px;
+        text-transform:uppercase;
+        letter-spacing:.04em;
+    }
+
+    .num-card.selected{
+        border-color:var(--amber);
+        background:var(--amber-soft);
+    }
+
+    .num-card.selected .n{
+        color:var(--amber);
+    }
+
+    /* ---------- SUMMARY + CTA ---------- */
+
+    .summary{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:16px;
+        margin-top:32px;
+        padding:16px 20px;
+        background:var(--bg-soft);
+        border:1px dashed var(--line);
+        border-radius:14px;
+        font-size:13.5px;
+        color:var(--muted);
+    }
+
+    .summary strong{
+        color:var(--ink);
+        font-weight:600;
+    }
+
+    .cta-btn{
+        appearance:none;
+        border:none;
+        background:linear-gradient(135deg, var(--indigo), var(--indigo-deep));
+        color:#fff;
+        font-family:'Sora', sans-serif;
+        font-weight:700;
+        font-size:16px;
+        padding:16px 22px;
+        border-radius:14px;
+        width:100%;
+        margin-top:24px;
+        cursor:pointer;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:10px;
+        box-shadow:0 18px 36px -16px rgba(108,99,255,0.55);
+        transition:transform .15s ease, box-shadow .15s ease;
+    }
+
+    .cta-btn:hover{
+        transform:translateY(-1px);
+        box-shadow:0 22px 40px -16px rgba(108,99,255,0.65);
+    }
+
+    .cta-btn:active{
+        transform:translateY(0);
+    }
+
+    /* ---------- BACK LINK ---------- */
+
+    .back-row{
+        text-align:center;
+        margin-top:28px;
+    }
+
+    .back-link{
+        color:var(--muted);
+        font-size:14px;
+        font-weight:600;
+        text-decoration:none;
+    }
+
+    .back-link:hover{
+        color:var(--ink);
+    }
+
+    @media (max-width:560px){
+        .diff-grid{ grid-template-columns:1fr; }
+        .num-grid{ grid-template-columns:repeat(2, 1fr); }
+        .panel{ padding:28px 22px; }
+        .hero{ padding:34px 26px; }
+        .summary{ flex-direction:column; align-items:flex-start; }
+    }
+
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+    <div class="hero">
+        <span class="eyebrow">⚡ Skill Check</span>
+        <h1>{{ course_name }} Quiz</h1>
+        <p>Pick a difficulty and question count, then put your knowledge to the test.</p>
+    </div>
+
+    <form class="panel" method="GET" action="/learning/{{ course_slug }}/quiz/start/" id="quizForm">
+
+        <input type="hidden" name="difficulty" id="difficulty_value" value="easy">
+        <input type="hidden" name="num_questions" id="num_questions_value" value="10">
+
+        <div class="step">
+            <span class="step-num">1</span>
+            <h3>Choose your difficulty</h3>
+        </div>
+        <p class="step-sub">Harder levels dig into deeper concepts and edge cases.</p>
+
+        <div class="diff-grid">
+            <button type="button" class="diff-card selected" data-val="easy" onclick="setDiff(this)">
+                <span class="dot"></span>
+                <span class="label">Easy</span>
+                <span class="desc">Core fundamentals & definitions</span>
+            </button>
+            <button type="button" class="diff-card" data-val="medium" onclick="setDiff(this)">
+                <span class="dot"></span>
+                <span class="label">Medium</span>
+                <span class="desc">Applied concepts & comparisons</span>
+            </button>
+            <button type="button" class="diff-card" data-val="hard" onclick="setDiff(this)">
+                <span class="dot"></span>
+                <span class="label">Hard</span>
+                <span class="desc">Architecture, tradeoffs & internals</span>
+            </button>
+        </div>
+
+        <div class="step">
+            <span class="step-num">2</span>
+            <h3>Number of questions</h3>
+        </div>
+        <p class="step-sub">Longer quizzes give a more reliable score.</p>
+
+        <div class="num-grid">
+            <button type="button" class="num-card selected" data-val="10" onclick="setNum(this)">
+                <span class="n">10</span>
+                <span class="t">Quick</span>
+            </button>
+            <button type="button" class="num-card" data-val="20" onclick="setNum(this)">
+                <span class="n">20</span>
+                <span class="t">Standard</span>
+            </button>
+            <button type="button" class="num-card" data-val="30" onclick="setNum(this)">
+                <span class="n">30</span>
+                <span class="t">Thorough</span>
+            </button>
+            <button type="button" class="num-card" data-val="50" onclick="setNum(this)">
+                <span class="n">50</span>
+                <span class="t">Full Test</span>
+            </button>
+        </div>
+
+        <div class="summary">
+            <span>You're about to start a <strong id="summaryText">10-question Easy</strong> quiz</span>
+            <span>⏱ ~<span id="timeEstimate">5</span> min</span>
+        </div>
+
+        <button type="submit" class="cta-btn">
+            🚀 Start Quiz
+        </button>
+
+    </form>
+
+    <div class="back-row">
+        <a href="/learning/{{ course_slug }}/" class="back-link">← Back to course</a>
+    </div>
+
+</div>
+
+<script>
+    function setDiff(btn){
+        document.querySelectorAll('.diff-card').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById('difficulty_value').value = btn.dataset.val;
+        updateSummary();
+    }
+
+    function setNum(btn){
+        document.querySelectorAll('.num-card').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById('num_questions_value').value = btn.dataset.val;
+        updateSummary();
+    }
+
+    function updateSummary(){
+        const diff = document.getElementById('difficulty_value').value;
+        const num = document.getElementById('num_questions_value').value;
+        const diffLabel = diff.charAt(0).toUpperCase() + diff.slice(1);
+        document.getElementById('summaryText').textContent = num + '-question ' + diffLabel;
+        document.getElementById('timeEstimate').textContent = Math.max(1, Math.round(num * 0.5));
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Resumes</title>
+</head>
+<body>
+
+<h1>My Uploaded Resumes</h1>
+
+{% for resume in resumes %}
+
+<p>
+    <a href="{{ resume.resume_file.url }}">
+        View Resume
+    </a>
+</p>
+<h3>
+ATS Score:
+{{ resume.ats_score }}/100
+</h3>
+
+<h3>Extracted Text</h3>
+
+<pre>
+{{ resume.extracted_text }}
+</pre>
+
+<hr>
+
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,436 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ course_name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="course-hub-page">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
+<style>
+  .course-hub-page {
+    --ink: #0F1420;
+    --surface: #161D2E;
+    --border: #2A3550;
+    --teal: #3FD0C9;
+    --teal-soft: rgba(63, 208, 201, .16);
+    --amber: #F5A623;
+    --amber-soft: rgba(245, 166, 35, .16);
+    --text-high: #F4F6FB;
+    --text-muted: #93A0BD;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .course-hub-page .container { max-width: 1080px; }
+
+  .course-hub-page .hero {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding: 3.25rem 2rem;
+    margin-bottom: 3rem;
+    border-radius: 22px;
+    border: 1px solid var(--border);
+    background: radial-gradient(circle at 50% 0%, #1B2438 0%, var(--ink) 70%);
+    background-image:
+      radial-gradient(circle at 50% 0%, #1B2438 0%, var(--ink) 70%),
+      radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size: auto, 22px 22px;
+  }
+
+  .course-hub-page .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.9rem, 4.5vw, 2.75rem);
+    color: var(--text-high);
+    margin-bottom: .9rem;
+    letter-spacing: -.01em;
+  }
+
+  .course-hub-page .hero .lead {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .6rem;
+    margin: 0;
+  }
+
+  .course-hub-page .hero .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem;
+    color: var(--text-high);
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--border);
+    padding: .45rem 1rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .course-hub-page .track-label {
+    display: flex;
+    align-items: baseline;
+    gap: .85rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .course-hub-page .track-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem;
+    letter-spacing: .08em;
+    color: var(--teal);
+    border: 1px solid rgba(63,208,201,.4);
+    padding: .25rem .6rem;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .course-hub-page .track-label--career .track-tag {
+    color: var(--amber);
+    border-color: rgba(245,166,35,.45);
+  }
+
+  .course-hub-page .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--text-high);
+    margin: 0;
+  }
+
+  .course-hub-page .journey-track { position: relative; }
+
+  @media (min-width: 768px) {
+    .course-hub-page .journey-track::before {
+      content: "";
+      position: absolute;
+      top: 77px;
+      left: 10%;
+      right: 10%;
+      height: 0;
+      border-top: 2px dashed rgba(63,208,201,.4);
+      z-index: 0;
+    }
+    .course-hub-page .journey-track--career::before {
+      border-top-color: rgba(245,166,35,.45);
+    }
+  }
+
+  .course-hub-page .feature-card {
+    position: relative;
+    z-index: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+  }
+
+  .course-hub-page .feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 22px 40px -22px rgba(0,0,0,.55);
+    border-color: var(--teal);
+  }
+
+  .course-hub-page .journey-track--career .feature-card:hover {
+    border-color: var(--amber);
+  }
+
+  .course-hub-page .feature-card .card-body {
+    padding: 2.75rem 1.6rem 2rem;
+    position: relative;
+  }
+
+  .course-hub-page .step-no {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .72rem;
+    letter-spacing: .05em;
+    color: var(--text-muted);
+  }
+
+  .course-hub-page .step-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    border-radius: 50%;
+    background: var(--teal-soft);
+    border: 1px solid rgba(63,208,201,.4);
+  }
+
+  .course-hub-page .journey-track--career .step-icon {
+    background: var(--amber-soft);
+    border-color: rgba(245,166,35,.45);
+  }
+
+  .course-hub-page .feature-card h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-high);
+    margin-bottom: .5rem;
+  }
+
+  .course-hub-page .feature-card p {
+    color: var(--text-muted);
+    font-size: .92rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .course-hub-page .btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: .92rem;
+    border-radius: 999px;
+    padding: .6rem 1.4rem;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    transition: all .2s ease;
+  }
+
+  .course-hub-page .btn-arrow { transition: transform .2s ease; }
+  .course-hub-page .btn:hover .btn-arrow { transform: translateX(4px); }
+
+  .course-hub-page .btn-primary,
+  .course-hub-page .btn-success {
+    background: linear-gradient(135deg, var(--teal), #29A39D);
+    color: #07211E;
+  }
+  .course-hub-page .btn-primary:hover,
+  .course-hub-page .btn-success:hover { filter: brightness(1.08); color: #07211E; }
+
+  .course-hub-page .btn-warning {
+    background: transparent;
+    border-color: rgba(63,208,201,.5);
+    color: var(--teal);
+  }
+  .course-hub-page .btn-warning:hover { background: var(--teal-soft); color: var(--teal); }
+
+  .course-hub-page .btn-dark {
+    background: linear-gradient(135deg, var(--amber), #C9821A);
+    color: #2B1A02;
+  }
+  .course-hub-page .btn-dark:hover { filter: brightness(1.08); color: #2B1A02; }
+
+  .course-hub-page .btn-outline-dark {
+    background: transparent;
+    border-color: rgba(245,166,35,.55);
+    color: var(--amber);
+  }
+  .course-hub-page .btn-outline-dark:hover { background: var(--amber-soft); color: var(--amber); }
+
+  .course-hub-page .btn:focus-visible {
+    outline: 2px solid var(--text-high);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .course-hub-page * { transition: none !important; }
+  }
+</style>
+
+<div class="container mt-4">
+
+    <!-- Hero Section -->
+
+    <div class="hero">
+
+        <h1>
+            🚀 {{ course_name }}
+        </h1>
+
+        <p class="lead">
+
+            <span class="pill">Learning Roadmap</span>
+            <span class="pill">Resources</span>
+            <span class="pill">Quiz</span>
+            <span class="pill">Interview Preparation</span>
+            <span class="pill">ATS Analysis</span>
+
+        </p>
+
+    </div>
+
+    <!-- Main Features -->
+
+    <div class="track-label">
+        <span class="track-tag">STAGE 01–03</span>
+        <h2 class="section-title">Learning Path</h2>
+    </div>
+
+    <div class="row g-4 journey-track">
+
+        <div class="col-md-4">
+
+            <div class="card feature-card h-100">
+
+                <div class="card-body text-center">
+
+                    <span class="step-no">01</span>
+
+                    <div class="step-icon">🗺️</div>
+
+                    <h4>Roadmap</h4>
+
+                    <p>
+                        Follow the complete learning path.
+                    </p>
+
+                    <a href="/learning/{{ course_name|slugify }}/roadmap/"
+                       class="btn btn-primary">
+
+                        View Roadmap <span class="btn-arrow">→</span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card feature-card h-100">
+
+                <div class="card-body text-center">
+
+                    <span class="step-no">02</span>
+
+                    <div class="step-icon">📚</div>
+
+                    <h4>Learning Resources</h4>
+
+                    <p>
+                        PDFs, notes, videos and practice links.
+                    </p>
+
+                    <a href="/learning/{{ course_name|slugify }}/learn/"
+                       class="btn btn-success">
+
+                        Learn Now <span class="btn-arrow">→</span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card feature-card h-100">
+
+                <div class="card-body text-center">
+
+                    <span class="step-no">03</span>
+
+                    <div class="step-icon">📝</div>
+
+                    <h4>Quiz Practice</h4>
+
+                    <p>
+                        Test your knowledge with quizzes.
+                    </p>
+
+                    <a href="/learning/{{ course_name|slugify }}/quiz/"
+                       class="btn btn-warning">
+
+                        Start Quiz <span class="btn-arrow">→</span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Career Preparation -->
+
+    <div class="track-label track-label--career mt-5">
+        <span class="track-tag">STAGE 04–05</span>
+        <h2 class="section-title">Career Preparation</h2>
+    </div>
+
+    <div class="row g-4 journey-track journey-track--career">
+
+        <div class="col-md-4">
+
+            <div class="card feature-card h-100">
+
+                <div class="card-body text-center">
+
+                    <span class="step-no">04</span>
+
+                    <div class="step-icon">🎯</div>
+
+                    <h4>Interview Preparation</h4>
+
+                    <p>
+                        Technical and HR interview questions.
+                    </p>
+
+                    <a href="/learning/{{ course_name|slugify }}/interview/"
+                       class="btn btn-dark">
+
+                        Prepare <span class="btn-arrow">→</span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card feature-card h-100">
+
+                <div class="card-body text-center">
+
+                    <span class="step-no">05</span>
+
+                    <div class="step-icon">📊</div>
+
+                    <h4>Dashboard</h4>
+
+                    <p>
+                        Track your progress and manage everything in one place.
+                    </p>
+
+                    <a href="/learning/{{ course_name|slugify }}/dashboard/"
+                       class="btn btn-outline-dark">
+
+                        Go to Dashboard <span class="btn-arrow">→</span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+{% endblock %}

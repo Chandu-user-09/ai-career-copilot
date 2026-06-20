@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="card shadow-lg p-5">
+
+        <h1>
+            🚀 ATS Optimized Resume Generator
+        </h1>
+
+        <p>
+            Upload your resume and generate an ATS-optimized version.
+        </p>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <input
+                type="file"
+                name="resume_file"
+                class="form-control"
+                accept=".pdf,.docx"
+            >
+
+            <button
+                class="btn btn-success mt-4"
+            >
+                Generate Resume
+            </button>
+
+        </form>
+        
+{% if generated_resume %}
+
+<div class="card mt-5 p-4">
+
+    <h3>
+        ATS Optimized Resume
+    </h3>
+
+    <pre style="white-space: pre-wrap;">
+{{ generated_resume }}
+    </pre>
+
+</div>
+
+{% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

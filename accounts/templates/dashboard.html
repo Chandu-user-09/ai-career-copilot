@@ -1,0 +1,410 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+<!-- Bootstrap Icons Connection -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- Premium Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="container-fluid p-0 page-wrapper">
+    <div class="row g-0">
+
+        <!-- Sidebar Navigation -->
+        <div class="col-md-2">
+            <div class="sidebar-navigation d-flex flex-column justify-content-between">
+                <div>
+                    <div class="sidebar-brand-wrapper">
+                        <i class="bi bi-rocket-takeoff-fill brand-icon"></i>
+                        <span class="brand-text">Career Copilot</span>
+                    </div>
+
+                    <nav class="menu-group">
+                        <a href="/dashboard/" class="menu-item active">
+                            <i class="bi bi-grid-1x2"></i> Dashboard
+                        </a>
+
+                        <a href="/learning/" class="menu-item">
+                            <i class="bi bi-journal-bookmark"></i> Learning Hub
+                        </a>
+
+                        <a href="/learning/ai-mentor/" class="menu-item">
+                            <i class="bi bi-cpu"></i> AI Mentor
+                        </a>
+
+                        <a href="/resume/analyzer/" class="menu-item">
+                            <i class="bi bi-file-earmark-bar-graph"></i> Resume Analyzer
+                        </a>
+                        
+                        <a href="/resume-builder/" class="menu-item">
+                            <i class="bi bi-file-earmark-text"></i> Resume Builder
+                        </a>
+
+                        <!-- Added Online Compiler Button Directly Under Resume Builder -->
+                        <a href="/compiler/" class="menu-item">
+                            <i class="bi bi-terminal"></i> Online Compiler
+                        </a>
+                    </nav>
+                </div>
+
+                <div class="sidebar-footer">
+                    <a href="/logout/" class="menu-item logout-link">
+                        <i class="bi bi-box-arrow-left"></i> Sign Out
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Workspace (Dark Theme) -->
+        <div class="col-md-10">
+            <div class="main-content-area">
+
+                <!-- Welcome Board -->
+                <div class="dashboard-welcome-panel">
+                    <div class="welcome-text-group">
+                        <h1 class="welcome-heading">Welcome back, {{ request.user.username }}</h1>
+                        <p class="welcome-subtext">Manage your engineering path, fine-tune milestones, and optimize platform assessments.</p>
+                    </div>
+                </div>
+
+                <!-- Strategic Overview Metrics -->
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="metric-card-premium">
+                            <div class="metric-header-row">
+                                <span class="metric-label-text">Career Paths</span>
+                                <div class="metric-badge-icon color-indigo"><i class="bi bi-compass"></i></div>
+                            </div>
+                            <h2 class="metric-large-number">{{ total_courses }}</h2>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="metric-card-premium">
+                            <div class="metric-header-row">
+                                <span class="metric-label-text">Resources</span>
+                                <div class="metric-badge-icon color-blue"><i class="bi bi-folder2-open"></i></div>
+                            </div>
+                            <h2 class="metric-large-number">{{ total_resources }}</h2>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="metric-card-premium">
+                            <div class="metric-header-row">
+                                <span class="metric-label-text">AI Assistance</span>
+                                <div class="metric-badge-icon color-purple"><i class="bi bi-lightning-charge"></i></div>
+                            </div>
+                            <h2 class="metric-large-number">24/7</h2>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="metric-card-premium">
+                            <div class="metric-header-row">
+                                <span class="metric-label-text">ATS Checking</span>
+                                <div class="metric-badge-icon color-emerald"><i class="bi bi-shield-check"></i></div>
+                            </div>
+                            <h2 class="metric-large-number">Active</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Routing Block -->
+                <h4 class="section-title-divider">Quick Hub Management</h4>
+
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <a href="/learning/" class="card-action-anchor">
+                            <div class="interactive-action-card">
+                                <div class="action-icon-circle color-indigo-bg">
+                                    <i class="bi bi-collection-play"></i>
+                                </div>
+                                <h5 class="action-title">Learning Hub</h5>
+                                <p class="action-desc">Advance through active development milestones and assessment tracks.</p>
+                                <div class="action-footer-arrow">Explore Path <i class="bi bi-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-4">
+                        <a href="/learning/ai-mentor/" class="card-action-anchor">
+                            <div class="interactive-action-card">
+                                <div class="action-icon-circle color-purple-bg">
+                                    <i class="bi bi-robot"></i>
+                                </div>
+                                <h5 class="action-title">AI Mentor</h5>
+                                <p class="action-desc">Resolve runtime issues, debug frameworks, or practice conceptual logic problems.</p>
+                                <div class="action-footer-arrow">Launch Session <i class="bi bi-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-4">
+                        <a href="/resume/analyzer/" class="card-action-anchor">
+                            <div class="interactive-action-card">
+                                <div class="action-icon-circle color-emerald-bg">
+                                    <i class="bi bi-file-earmark-ruled"></i>
+                                </div>
+                                <h5 class="action-title">Resume Analyzer</h5>
+                                <p class="action-desc">Optimize template keywords against modern automated ATS assessment matrix parameters.</p>
+                                <div class="action-footer-arrow">Run Analytics <i class="bi bi-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* Dark Framework Architecture Styling */
+    .page-wrapper {
+        font-family: 'Inter', sans-serif;
+        background-color: #0b0f19; /* Ultra Dark Background */
+        min-height: 100vh;
+        letter-spacing: -0.01em;
+    }
+
+    .main-content-area {
+        padding: 40px;
+    }
+
+    /* Premium Dark Sidebar Layout */
+    .sidebar-navigation {
+        background-color: #0f172a; /* Slate Dark */
+        min-height: 100vh;
+        padding: 32px 16px;
+        border-right: 1px solid #1e293b;
+    }
+
+    .sidebar-brand-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 16px;
+        margin-bottom: 40px;
+    }
+
+    .brand-icon {
+        color: #818cf8; /* Brightened for Dark Mode visibility */
+        font-size: 1.5rem;
+    }
+
+    .brand-text {
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: -0.02em;
+    }
+
+    .menu-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        color: #94a3b8;
+        font-weight: 500;
+        font-size: 0.95rem;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .menu-item i {
+        font-size: 1.15rem;
+    }
+
+    .menu-item:hover {
+        color: #ffffff;
+        background-color: #1e293b;
+    }
+
+    .menu-item.active {
+        color: #ffffff;
+        background-color: #1e293b;
+        border-left-color: #6366f1;
+        font-weight: 600;
+    }
+
+    .sidebar-footer {
+        padding-top: 20px;
+        border-top: 1px solid #1e293b;
+    }
+
+    .logout-link {
+        color: #f87171;
+    }
+
+    .logout-link:hover {
+        background-color: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+    }
+
+    /* Gradient Hero Welcome Panel */
+    .dashboard-welcome-panel {
+        background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 100%); /* Deep Indigo to Deep Purple */
+        padding: 40px;
+        border-radius: 16px;
+        margin-bottom: 36px;
+        border: 1px solid #312e81;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .welcome-heading {
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 1.85rem;
+        margin-bottom: 8px;
+    }
+
+    .welcome-subtext {
+        color: #cbd5e1;
+        font-size: 1rem;
+        margin: 0;
+        max-width: 700px;
+        line-height: 1.5;
+    }
+
+    /* KPI Metric Displays */
+    .metric-card-premium {
+        background-color: #121826; /* Dark surface tint */
+        border: 1px solid #1e293b;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    .metric-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .metric-label-text {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .metric-badge-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+    }
+
+    /* Adjusted color contrasts for premium dark theme */
+    .color-indigo { color: #818cf8; background-color: rgba(99, 102, 241, 0.15); }
+    .color-blue { color: #60a5fa; background-color: rgba(59, 130, 246, 0.15); }
+    .color-purple { color: #c084fc; background-color: rgba(168, 85, 247, 0.15); }
+    .color-emerald { color: #34d399; background-color: rgba(16, 185, 129, 0.15); }
+
+    .metric-large-number {
+        font-size: 2.1rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 0;
+        letter-spacing: -0.03em;
+    }
+
+    /* Mid-level Divider Layout */
+    .section-title-divider {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-top: 44px;
+        margin-bottom: 24px;
+    }
+
+    /* Interactive Hub Action Panels */
+    .card-action-anchor {
+        text-decoration: none !important;
+        color: inherit;
+    }
+
+    .interactive-action-card {
+        background-color: #121826;
+        border: 1px solid #1e293b;
+        border-radius: 14px;
+        padding: 32px 24px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .action-icon-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+    }
+
+    .color-indigo-bg { background-color: rgba(79, 70, 229, 0.15); color: #818cf8; }
+    .color-purple-bg { background-color: rgba(124, 58, 237, 0.15); color: #c084fc; }
+    .color-emerald-bg { background-color: rgba(5, 150, 105, 0.15); color: #34d399; }
+
+    .action-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 10px;
+    }
+
+    .action-desc {
+        font-size: 0.925rem;
+        color: #94a3b8;
+        line-height: 1.5;
+        margin-bottom: 24px;
+        flex-grow: 1;
+    }
+
+    .action-footer-arrow {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #818cf8;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: gap 0.2s;
+    }
+
+    .interactive-action-card:hover {
+        transform: translateY(-4px);
+        background-color: #1e293b;
+        border-color: #334155;
+        box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .interactive-action-card:hover .action-footer-arrow {
+        gap: 10px;
+        color: #a5b4fc;
+    }
+</style>
+{% endblock %}

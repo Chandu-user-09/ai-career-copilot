@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ course_name }} Learning Portal
+{% endblock %}
+
+{% block content %}
+
+<div class="lp-wrap">
+
+    <!-- Hero Section -->
+
+    <div class="lp-hero">
+        <span class="lp-eyebrow">🚀 Learning Portal</span>
+        <h1>{{ course_name }}</h1>
+        <p>Study materials, online resources, videos, and an AI mentor — everything in one place.</p>
+    </div>
+
+    <!-- Resources -->
+
+    <div class="lp-grid">
+
+        <!-- Study Materials -->
+
+        <div class="lp-card">
+
+            <div class="lp-card-head">
+                <div class="lp-icon icon-blue">📚</div>
+                <div>
+                    <h3>Study Materials</h3>
+                    <span class="lp-count">{{ materials|length }} item{{ materials|length|pluralize }}</span>
+                </div>
+            </div>
+
+            <div class="lp-list">
+
+                {% for material in materials %}
+
+                <div class="lp-item">
+                    <span class="lp-item-label">📄 {{ material.title }}</span>
+
+                    {% if material.pdf_file %}
+                    <a href="{{ material.pdf_file.url }}" target="_blank" class="lp-btn lp-btn-blue">Open</a>
+                    {% endif %}
+                </div>
+
+                {% empty %}
+
+                <div class="lp-empty">📂 No study materials available yet</div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        <!-- Practice Resources -->
+
+        <div class="lp-card">
+
+            <div class="lp-card-head">
+                <div class="lp-icon icon-green">🌐</div>
+                <div>
+                    <h3>Online Resources</h3>
+                    <span class="lp-count">{{ links|length }} item{{ links|length|pluralize }}</span>
+                </div>
+            </div>
+
+            <div class="lp-list">
+
+                {% for link in links %}
+
+                <div class="lp-item">
+                    <span class="lp-item-label">🔗 {{ link.title }}</span>
+                    <a href="{{ link.url }}" target="_blank" class="lp-btn lp-btn-green">Visit</a>
+                </div>
+
+                {% empty %}
+
+                <div class="lp-empty">🌐 No Online resources available yet</div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        <!-- Video Tutorials -->
+
+        <div class="lp-card">
+
+            <div class="lp-card-head">
+                <div class="lp-icon icon-red">🎥</div>
+                <div>
+                    <h3>Video Tutorials</h3>
+                    <span class="lp-count">{{ videos|length }} item{{ videos|length|pluralize }}</span>
+                </div>
+            </div>
+
+            <div class="lp-list">
+
+                {% for video in videos %}
+
+                <div class="lp-item">
+                    <span class="lp-item-label">▶️ {{ video.title }}</span>
+                    <a href="{{ video.url }}" target="_blank" class="lp-btn lp-btn-red">Watch</a>
+                </div>
+
+                {% empty %}
+
+                <div class="lp-empty">🎥 No video tutorials available yet</div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        <!-- AI Mentor -->
+
+        <div class="lp-card lp-card-mentor">
+
+            <div class="lp-card-head">
+                <div class="lp-icon icon-amber">🤖</div>
+                <div>
+                    <h3>AI Mentor</h3>
+                    <span class="lp-count">{{ ai_mentors|length }} resource{{ ai_mentors|length|pluralize }}</span>
+                </div>
+            </div>
+
+            <p class="lp-mentor-desc">Ask doubts, get explanations, interview guidance and coding help — anytime.</p>
+
+            <a href="/learning/ai-mentor/?course={{ course_name }}" class="lp-cta">Open AI Mentor</a>
+
+            <div class="lp-divider"></div>
+
+            <div class="lp-list">
+
+                {% for mentor in ai_mentors %}
+
+                <div class="lp-item">
+                    <span class="lp-item-label">🤖 {{ mentor.title }}</span>
+                    <a href="{{ mentor.url }}" target="_blank" class="lp-btn lp-btn-amber">Open</a>
+                </div>
+
+                {% empty %}
+
+                <div class="lp-empty">🤖 AI mentor resources will appear here</div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Bottom Buttons -->
+
+    <div class="lp-back-row">
+        <a href="/learning/{{ course_name|slugify }}/" class="lp-back-link">← Back to course</a>
+    </div>
+
+</div>
+
+<style>
+
+:root{
+    --lp-bg:#0b0c14;
+    --lp-bg-soft:#11131f;
+    --lp-card:#161826;
+    --lp-line:#262a3d;
+    --lp-ink:#eef0fb;
+    --lp-muted:#8a8da3;
+    --lp-indigo:#6c63ff;
+    --lp-indigo-deep:#4f46e5;
+    --lp-blue:#4f8cff;
+    --lp-green:#2bb673;
+    --lp-red:#ef4a48;
+    --lp-amber:#f5a524;
+}
+
+.lp-wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding:8px 4px 60px;
+    font-family:'Inter', -apple-system, sans-serif;
+    color:var(--lp-ink);
+}
+
+/* ---------- HERO ---------- */
+
+.lp-hero{
+    position:relative;
+    background:linear-gradient(160deg, #1a1640 0%, #110f30 70%, #0b0c14 100%);
+    border:1px solid var(--lp-line);
+    border-radius:24px;
+    padding:46px 44px;
+    margin-bottom:32px;
+    overflow:hidden;
+    isolation:isolate;
+}
+
+.lp-hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+        radial-gradient(circle at 88% 14%, rgba(108,99,255,0.28), transparent 45%),
+        radial-gradient(circle at 8% 100%, rgba(245,165,36,0.10), transparent 50%);
+    z-index:-1;
+}
+
+.lp-eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:#b3aeff;
+    background:rgba(108,99,255,0.14);
+    border:1px solid rgba(108,99,255,0.35);
+    padding:6px 14px;
+    border-radius:999px;
+}
+
+.lp-hero h1{
+    font-size:clamp(28px, 4vw, 38px);
+    font-weight:800;
+    line-height:1.15;
+    margin:18px 0 8px;
+    letter-spacing:-0.01em;
+    color:#fff;
+}
+
+.lp-hero p{
+    margin:0;
+    font-size:15.5px;
+    color:var(--lp-muted);
+    max-width:560px;
+}
+
+/* ---------- GRID ---------- */
+
+.lp-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.lp-card{
+    background:var(--lp-card);
+    border:1px solid var(--lp-line);
+    border-radius:20px;
+    padding:28px;
+    transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.lp-card:hover{
+    transform:translateY(-4px);
+    border-color:#34395a;
+    box-shadow:0 20px 44px -28px rgba(108,99,255,0.45);
+}
+
+.lp-card-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:18px;
+}
+
+.lp-icon{
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    flex-shrink:0;
+}
+
+.icon-blue{ background:rgba(79,140,255,0.14); }
+.icon-green{ background:rgba(43,182,115,0.14); }
+.icon-red{ background:rgba(239,74,72,0.14); }
+.icon-amber{ background:rgba(245,165,36,0.14); }
+
+.lp-card-head h3{
+    font-size:17px;
+    font-weight:700;
+    margin:0 0 4px;
+    color:var(--lp-ink);
+}
+
+.lp-count{
+    font-size:12px;
+    font-weight:600;
+    color:var(--lp-muted);
+    background:var(--lp-bg-soft);
+    border:1px solid var(--lp-line);
+    padding:3px 10px;
+    border-radius:999px;
+}
+
+/* ---------- LIST ---------- */
+
+.lp-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.lp-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:13px 14px;
+    background:var(--lp-bg-soft);
+    border:1px solid var(--lp-line);
+    border-radius:12px;
+    transition:border-color .15s ease;
+}
+
+.lp-item:hover{
+    border-color:#34395a;
+}
+
+.lp-item-label{
+    font-size:14px;
+    color:#d6d8ea;
+    line-height:1.4;
+}
+
+.lp-empty{
+    text-align:center;
+    padding:22px 14px;
+    font-size:13.5px;
+    color:var(--lp-muted);
+    background:var(--lp-bg-soft);
+    border:1px dashed var(--lp-line);
+    border-radius:12px;
+}
+
+/* ---------- BUTTONS ---------- */
+
+.lp-btn{
+    flex-shrink:0;
+    font-size:12.5px;
+    font-weight:700;
+    text-decoration:none;
+    padding:7px 14px;
+    border-radius:9px;
+    transition:transform .12s ease, opacity .12s ease;
+}
+
+.lp-btn:hover{
+    transform:translateY(-1px);
+    opacity:0.9;
+}
+
+.lp-btn-blue{ background:rgba(79,140,255,0.16); color:#9cbcff; border:1px solid rgba(79,140,255,0.35); }
+.lp-btn-green{ background:rgba(43,182,115,0.16); color:#6fe0ac; border:1px solid rgba(43,182,115,0.35); }
+.lp-btn-red{ background:rgba(239,74,72,0.16); color:#ff9b99; border:1px solid rgba(239,74,72,0.35); }
+.lp-btn-amber{ background:rgba(245,165,36,0.16); color:#ffd28a; border:1px solid rgba(245,165,36,0.35); }
+
+/* ---------- AI MENTOR CARD ---------- */
+
+.lp-card-mentor{
+    background:linear-gradient(160deg, #161826 0%, #15132e 100%);
+}
+
+.lp-mentor-desc{
+    font-size:13.5px;
+    color:var(--lp-muted);
+    line-height:1.5;
+    margin:0 0 18px;
+}
+
+.lp-cta{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    text-decoration:none;
+    background:linear-gradient(135deg, var(--lp-indigo), var(--lp-indigo-deep));
+    color:#fff;
+    font-weight:700;
+    font-size:14.5px;
+    padding:13px;
+    border-radius:12px;
+    box-shadow:0 14px 28px -14px rgba(108,99,255,0.55);
+    transition:transform .15s ease, box-shadow .15s ease;
+}
+
+.lp-cta:hover{
+    transform:translateY(-1px);
+    box-shadow:0 18px 32px -14px rgba(108,99,255,0.65);
+}
+
+.lp-divider{
+    height:1px;
+    background:var(--lp-line);
+    margin:20px 0;
+}
+
+/* ---------- BACK LINK ---------- */
+
+.lp-back-row{
+    text-align:center;
+    margin-top:36px;
+}
+
+.lp-back-link{
+    color:var(--lp-muted);
+    font-size:14px;
+    font-weight:600;
+    text-decoration:none;
+}
+
+.lp-back-link:hover{
+    color:var(--lp-ink);
+}
+
+@media (max-width:760px){
+    .lp-grid{ grid-template-columns:1fr; }
+    .lp-hero{ padding:34px 26px; }
+    .lp-card{ padding:22px; }
+}
+
+</style>
+
+{% endblock %}

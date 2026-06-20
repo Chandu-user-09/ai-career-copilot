@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Resume Template — Technical</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --panel:#161922;
+    --ink:#e6e8eb;
+    --muted:#8b93a1;
+    --accent:#5fd0a0;
+    --rule:#262a35;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#e9e9e7;
+    font-family:'Segoe UI',Arial,sans-serif;
+    color:var(--ink);
+  }
+  .page{
+    max-width:8.5in;
+    margin:32px auto;
+    background:var(--bg);
+    padding:0.55in 0.6in;
+    box-shadow:0 0 18px rgba(0,0,0,.25);
+  }
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    border-bottom:1px solid var(--rule);
+    padding-bottom:16px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .name-block .prompt{
+    font-family:'Consolas','Courier New',monospace;
+    font-size:12px;
+    color:var(--accent);
+    margin-bottom:4px;
+  }
+  h1{
+    margin:0 0 2px;
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:-0.3px;
+  }
+  .role{
+    font-family:'Consolas','Courier New',monospace;
+    font-size:13px;
+    color:var(--muted);
+  }
+  .contact{
+    text-align:right;
+    font-size:11.5px;
+    color:var(--muted);
+    line-height:1.7;
+  }
+  .contact a, .contact span{color:var(--muted);}
+
+  section{margin-bottom:24px;}
+  h2{
+    font-family:'Consolas','Courier New',monospace;
+    font-size:12.5px;
+    letter-spacing:1px;
+    color:var(--accent);
+    margin:0 0 14px;
+  }
+  h2::before{content:"// ";color:var(--muted);}
+
+  .summary{font-size:13px;line-height:1.65;color:#cfd3da;}
+
+  .entry{margin-bottom:18px;}
+  .entry:last-child{margin-bottom:0;}
+  .entry-top{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;}
+  .entry-title{font-size:14.5px;font-weight:700;color:var(--ink);}
+  .entry-date{font-family:'Consolas','Courier New',monospace;font-size:11px;color:var(--muted);}
+  .entry-org{font-size:12.5px;color:var(--accent);margin-bottom:6px;}
+  .entry ul{margin:0;padding-left:18px;}
+  .entry li{font-size:12.5px;line-height:1.6;color:#cfd3da;margin-bottom:3px;}
+  .entry li::marker{color:var(--accent);}
+
+  .stack-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+  .stack-tag{
+    font-family:'Consolas','Courier New',monospace;
+    font-size:10.5px;
+    background:var(--panel);
+    border:1px solid var(--rule);
+    color:var(--accent);
+    border-radius:3px;
+    padding:3px 7px;
+  }
+
+  .skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px;}
+  .skill-row{margin-bottom:2px;}
+  .skill-label{display:flex;justify-content:space-between;font-size:12px;color:#cfd3da;margin-bottom:5px;}
+  .skill-label .lvl{font-family:'Consolas','Courier New',monospace;color:var(--muted);}
+  .skill-track{height:5px;background:var(--panel);border-radius:3px;overflow:hidden;}
+  .skill-fill{height:100%;background:var(--accent);}
+
+  .proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .proj-card{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px;}
+  .proj-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+  .proj-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+
+  .edu-row{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px;color:#cfd3da;}
+  .edu-row .meta{color:var(--muted);font-family:'Consolas','Courier New',monospace;font-size:11px;}
+.project{
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-radius:6px;
+    padding:14px;
+    margin-bottom:16px;
+}
+
+.project h4{
+    margin:0 0 6px;
+    color:var(--accent);
+    font-size:14px;
+}
+
+.project p{
+    margin:4px 0;
+    font-size:12px;
+    line-height:1.6;
+}
+
+.download-btn{
+    text-align:center;
+    margin-top:40px;
+}
+  @media print{
+
+    .download-btn{
+        display:none;
+    }
+
+    body{
+        background:#fff;
+    }
+
+    .page{
+        box-shadow:none;
+        margin:0;
+        max-width:100%;
+    }
+
+    @page{
+        size:A4;
+        margin:10mm;
+    }
+}
+  @media (max-width:700px){
+    header{flex-direction:column;}
+    .contact{text-align:left;}
+    .skills-grid, .proj-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+
+<body>
+<div class="page">
+
+  <header>
+
+
+<div class="name-block">
+
+  <div class="prompt">
+    $ whoami
+  </div>
+
+  <h1>{{ name }}</h1>
+
+  <div class="role">
+    Full Stack Developer
+  </div>
+
+</div>
+
+<div class="contact">
+
+  <div>{{ email }}</div>
+
+  <div>{{ phone }}</div>
+
+  {% if linkedin %}
+  <div>{{ linkedin }}</div>
+  {% endif %}
+
+  {% if github %}
+  <div>{{ github }}</div>
+  {% endif %}
+
+  <div>{{ location }}</div>
+
+</div>
+
+
+  </header>
+
+  <section>
+
+
+<h2>summary</h2>
+
+<p class="summary">
+  {{ summary }}
+</p>
+
+
+  </section>
+
+  <section>
+
+
+<h2>experience</h2>
+
+<div class="entry">
+
+  <div class="entry-org">
+    {{ experience|linebreaks }}
+  </div>
+
+  <div class="stack-row">
+    <span class="stack-tag">Python</span>
+    <span class="stack-tag">Java</span>
+    <span class="stack-tag">Django</span>
+    <span class="stack-tag">React</span>
+    <span class="stack-tag">SQL</span>
+  </div>
+
+</div>
+
+
+  </section>
+
+  <section>
+
+
+<h2>skills</h2>
+
+<div class="proj-card">
+
+    <div class="proj-desc">
+        {{ skills|linebreaks }}
+    </div>
+
+</div>
+
+
+  </section>
+
+  <section>
+
+
+<h2>Projects</h2>
+
+{% for project in projects %}
+
+<div class="project">
+
+    <h4>{{ project.name }}</h4>
+
+    <p>
+        <strong>Tech Stack:</strong>
+        {{ project.stack }}
+    </p>
+
+    <p>
+        {{ project.description }}
+    </p>
+
+</div>
+
+{% empty %}
+
+<p>No Projects Added</p>
+
+{% endfor %}
+
+
+  </section>
+
+  <section>
+
+
+<h2>education</h2>
+
+<div class="edu-row">
+
+  <span>
+    {{ education|linebreaks }}
+</span>
+
+  <span class="meta">
+    Academic Background
+  </span>
+
+</div>
+
+
+  </section>
+
+  <section>
+
+
+<h2>certifications</h2>
+
+<div class="proj-card">
+
+  <div class="proj-desc">
+    {{ certifications|linebreaks }}
+  </div>
+
+</div>
+
+
+  </section>
+
+</div>
+<div class="download-btn"></div>
+
+    <button
+        onclick="window.print()"
+        style="
+            padding:12px 25px;
+            background:#16a34a;
+            color:white;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:16px;
+        ">
+
+        Download / Save as PDF
+
+    </button>
+
+</div>
+</body>
+
+</html>

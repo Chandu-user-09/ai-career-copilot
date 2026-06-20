@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ course_name }} Roadmap
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="hero">
+        <h1>🚀 {{ course_name }} Roadmap</h1>
+        <p class="lead">Complete Learning Path for {{ course_name }}</p>
+    </div>
+
+    <div class="timeline">
+
+        {% for phase in roadmap_phases %}
+
+        <div class="roadmap-card" id="phase-{{ forloop.counter }}">
+
+            <div class="phase-header rm-c{{ forloop.counter }}" onclick="togglePhase(this)">
+
+                <div class="step-number">
+                    {{ forloop.counter }}
+                </div>
+
+                <div class="phase-title-block">
+                    <h4>{{ phase.title }}</h4>
+                    <p class="phase-desc">{{ phase.desc }}</p>
+                </div>
+
+                <span class="chevron">▼</span>
+
+            </div>
+
+            <div class="phase-body">
+
+                <div class="topics-row">
+                    {% for topic in phase.topics %}
+                    <span
+                        class="topic-pill rm-pill-{{ forloop.parentloop.counter }}"
+                        onclick="toggleSub(this, 'sub-{{ forloop.parentloop.counter }}-{{ forloop.counter }}')"
+                    >
+                        {{ topic.label }}
+                    </span>
+                    {% endfor %}
+                </div>
+
+                {% for topic in phase.topics %}
+                <div id="sub-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" class="subpanel">
+                    <p class="sub-title">{{ topic.label }}</p>
+                    <ul class="sub-list">
+                        {% for sub in topic.subs %}
+                        <li>{{ sub }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+
+                <p class="time-hint">⏱ Estimated time: {{ phase.time }}</p>
+
+            </div>
+
+        </div>
+
+        {% if not forloop.last %}
+        <div class="connector">↓</div>
+        {% endif %}
+
+        {% endfor %}
+
+    </div>
+
+    <div class="text-center mt-5">
+        <a href="/learning/{{ course_name|slugify }}/" class="btn btn-primary btn-lg">
+            ← Back To Course
+        </a>
+    </div>
+
+</div>
+
+<style>
+
+.hero {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white;
+    padding: 50px;
+    border-radius: 25px;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.timeline {
+    max-width: 800px;
+    margin: auto;
+}
+
+.roadmap-card {
+    background: #1e293b;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+.roadmap-card:hover {
+    box-shadow: 0 0 25px rgba(37,99,235,0.4);
+}
+
+/* ── Phase header ── */
+.phase-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: filter 0.15s;
+}
+.phase-header:hover { filter: brightness(1.08); }
+
+.step-number {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.phase-title-block { flex: 1; }
+
+.phase-title-block h4 {
+    margin: 0 0 4px;
+    color: white;
+    font-size: 16px;
+}
+
+.phase-desc {
+    margin: 0;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+}
+
+.chevron {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    transition: transform 0.25s;
+}
+.phase-header.open .chevron { transform: rotate(180deg); }
+
+/* ── Phase body ── */
+.phase-body {
+    display: none;
+    padding: 6px 20px 18px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+}
+.phase-body.open { display: block; }
+
+/* ── Topic pills ── */
+.topics-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.topic-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    color: white;
+    transition: opacity 0.15s, transform 0.1s;
+}
+.topic-pill:hover { opacity: 0.8; transform: translateY(-2px); }
+.topic-pill.active { font-weight: 700; }
+
+/* ── Subtopic panel ── */
+.subpanel {
+    display: none;
+    margin-top: 10px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    animation: fadeIn 0.2s ease;
+}
+.subpanel.open { display: block; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.sub-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin: 0 0 10px;
+}
+
+.sub-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+.sub-list li {
+    font-size: 12.5px;
+    color: #94a3b8;
+    padding-left: 18px;
+    position: relative;
+    line-height: 1.55;
+}
+.sub-list li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: #60a5fa;
+    font-size: 16px;
+    line-height: 1.2;
+}
+
+.time-hint {
+    font-size: 11px;
+    color: #475569;
+    font-style: italic;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+/* ── Connector arrow ── */
+.connector {
+    text-align: center;
+    font-size: 35px;
+    color: #60a5fa;
+    margin-bottom: 15px;
+}
+
+/* ── Per-phase color themes (header bg + badge + pills) ── */
+
+/* 1 Indigo */
+.rm-c1               { background: #1e1b4b; }
+.rm-c1 .step-number  { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+.rm-pill-1           { background: rgba(79,70,229,0.2); border-color: #4f46e5; }
+.rm-pill-1.active    { background: #4f46e5; }
+
+/* 2 Emerald */
+.rm-c2               { background: #064e3b; }
+.rm-c2 .step-number  { background: linear-gradient(135deg, #059669, #0d9488); }
+.rm-pill-2           { background: rgba(5,150,105,0.2); border-color: #059669; }
+.rm-pill-2.active    { background: #059669; }
+
+/* 3 Amber */
+.rm-c3               { background: #451a03; }
+.rm-c3 .step-number  { background: linear-gradient(135deg, #d97706, #f59e0b); }
+.rm-pill-3           { background: rgba(217,119,6,0.2); border-color: #d97706; }
+.rm-pill-3.active    { background: #d97706; }
+
+/* 4 Red */
+.rm-c4               { background: #450a0a; }
+.rm-c4 .step-number  { background: linear-gradient(135deg, #dc2626, #db2777); }
+.rm-pill-4           { background: rgba(220,38,38,0.2); border-color: #dc2626; }
+.rm-pill-4.active    { background: #dc2626; }
+
+/* 5 Blue */
+.rm-c5               { background: #0c1a40; }
+.rm-c5 .step-number  { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+.rm-pill-5           { background: rgba(37,99,235,0.2); border-color: #2563eb; }
+.rm-pill-5.active    { background: #2563eb; }
+
+/* 6 Purple */
+.rm-c6               { background: #2d1d3a; }
+.rm-c6 .step-number  { background: linear-gradient(135deg, #9333ea, #c026d3); }
+.rm-pill-6           { background: rgba(147,51,234,0.2); border-color: #9333ea; }
+.rm-pill-6.active    { background: #9333ea; }
+
+/* 7 Green */
+.rm-c7               { background: #082f1c; }
+.rm-c7 .step-number  { background: linear-gradient(135deg, #16a34a, #15803d); }
+.rm-pill-7           { background: rgba(22,163,74,0.2); border-color: #16a34a; }
+.rm-pill-7.active    { background: #16a34a; }
+
+/* 8 Orange */
+.rm-c8               { background: #1c1007; }
+.rm-c8 .step-number  { background: linear-gradient(135deg, #ea580c, #f97316); }
+.rm-pill-8           { background: rgba(234,88,12,0.2); border-color: #ea580c; }
+.rm-pill-8.active    { background: #ea580c; }
+
+</style>
+
+<script>
+
+function togglePhase(header) {
+    header.classList.toggle('open');
+    const body = header.nextElementSibling;
+    body.classList.toggle('open');
+}
+
+function toggleSub(pillEl, panelId) {
+    const card   = pillEl.closest('.roadmap-card');
+    const target = document.getElementById(panelId);
+    const isOpen = target.classList.contains('open');
+
+    card.querySelectorAll('.subpanel').forEach(p => p.classList.remove('open'));
+    card.querySelectorAll('.topic-pill').forEach(p => p.classList.remove('active'));
+
+    if (!isOpen) {
+        target.classList.add('open');
+        pillEl.classList.add('active');
+        setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
+    }
+}
+
+// Open first phase on load
+document.addEventListener('DOMContentLoaded', function () {
+    const firstHeader = document.querySelector('.phase-header');
+    if (firstHeader) togglePhase(firstHeader);
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Register
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="row justify-content-center align-items-center"
+         style="min-height:80vh;">
+
+        <div class="col-md-6">
+
+            <div class="card register-card">
+
+                <div class="card-body p-5">
+
+                    <div class="text-center mb-4">
+
+                        <h1>
+                            🚀 Create Account
+                        </h1>
+
+                        <p class="text-muted">
+
+                            Join AI Career Copilot and start learning
+
+                        </p>
+
+                    </div>
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        {{ form.as_p }}
+
+                        <div class="d-grid mt-4">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-lg">
+
+                                Register
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                    <hr>
+
+                    <div class="text-center">
+
+                        <p>
+
+                            Already have an account?
+
+                        </p>
+
+                        <a href="/login/"
+                           class="btn btn-outline-light">
+
+                            Login
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+.register-card{
+
+    background:#1e293b;
+
+    border:1px solid rgba(
+        255,
+        255,
+        255,
+        0.08
+    );
+
+    border-radius:25px;
+
+    box-shadow:
+    0 0 25px rgba(
+        37,
+        99,
+        235,
+        0.25
+    );
+
+}
+
+.register-card:hover{
+
+    box-shadow:
+    0 0 35px rgba(
+        37,
+        99,
+        235,
+        0.4
+    );
+
+    transition:0.3s;
+
+}
+
+form p{
+
+    margin-bottom:18px;
+
+}
+
+form label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:500;
+
+}
+
+form input{
+
+    width:100%;
+
+    padding:12px;
+
+    border-radius:10px;
+
+}
+
+</style>
+
+{% endblock %}

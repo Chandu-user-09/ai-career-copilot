@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="row justify-content-center align-items-center"
+         style="min-height:80vh;">
+
+        <div class="col-md-5">
+
+            <div class="card login-card">
+
+                <div class="card-body p-5">
+
+                    <div class="text-center mb-4">
+
+                        <h1>
+                            🔐 Login
+                        </h1>
+
+                        <p class="text-muted">
+
+                            Welcome back to AI Career Copilot
+
+                        </p>
+
+                    </div>
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Username
+
+                            </label>
+
+                            <input
+                                type="text"
+                                name="username"
+                                class="form-control"
+                                placeholder="Enter username"
+                                required>
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <label class="form-label">
+
+                                Password
+
+                            </label>
+
+                            <input
+                                type="password"
+                                name="password"
+                                class="form-control"
+                                placeholder="Enter password"
+                                required>
+
+                        </div>
+
+                        <div class="d-grid">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary btn-lg">
+
+                                Login
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                    <hr>
+
+                    <div class="text-center">
+
+                        <p>
+
+                            Don't have an account?
+
+                        </p>
+
+                        <a href="/register/"
+                           class="btn btn-outline-light">
+
+                            Create Account
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+
+.login-card{
+
+    background:#1e293b;
+
+    border:1px solid rgba(
+        255,
+        255,
+        255,
+        0.08
+    );
+
+    border-radius:25px;
+
+    box-shadow:
+    0 0 25px rgba(
+        37,
+        99,
+        235,
+        0.25
+    );
+
+}
+
+.login-card:hover{
+
+    box-shadow:
+    0 0 35px rgba(
+        37,
+        99,
+        235,
+        0.4
+    );
+
+    transition:0.3s;
+
+}
+
+</style>
+
+{% endblock %}

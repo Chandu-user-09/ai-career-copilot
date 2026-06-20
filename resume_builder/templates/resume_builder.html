@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Builder</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: #0f172a;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .main-card {
+      background: #1e293b;
+      border-radius: 20px;
+      color: white;
+      border: 1px solid #334155;
+    }
+
+    /* REDUCED TEMPLATE SIZE & IMPROVED HOVER DESIGN */
+    .template-card {
+      background: #131c2e;
+      border: 2px solid #334155;
+      border-radius: 12px;
+      transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .template-card:hover {
+      transform: translateY(-4px);
+      border-color: #3b82f6;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    }
+
+    .template-card img {
+      height: 180px; /* Greatly reduced image preview footprint */
+      object-fit: cover;
+      object-position: top;
+      width: 100%;
+    }
+
+    .template-card .card-body {
+      padding: 12px;
+      background: #1e293b;
+      color: #fff;
+    }
+
+    .template-card h5 {
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .template-card input[type="radio"] {
+      accent-color: #3b82f6;
+      transform: scale(1.1);
+    }
+
+    /* PREMIUM FORM CONTROLS */
+    .form-control,
+    textarea {
+      background: #0f172a !important;
+      color: white !important;
+      border: 1px solid #334155 !important;
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+
+    .form-control:focus, 
+    textarea:focus {
+      border-color: #3b82f6 !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+    }
+
+    .form-control::placeholder {
+      color: #64748b;
+    }
+
+    .section-title {
+      font-weight: 600;
+      font-size: 1.25rem;
+      margin-bottom: 20px;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .project-card {
+      background: #0f172a;
+      border-color: #334155 !important;
+    }
+
+    hr {
+      border-color: #334155;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container mt-5 mb-5">
+    <div class="card shadow-lg main-card">
+      <div class="card-body p-4 p-md-5">
+
+        <h1 class="text-center mb-2 fw-bold">🚀 AI Resume Builder</h1>
+
+        <p class="text-center mb-5 text-muted" style="color: #94a3b8 !important;">
+          Choose a template and build your professional resume.
+        </p>
+
+        <form method="POST">
+          {% csrf_token %}
+
+          <h3 class="section-title">Choose Resume Template</h3>
+
+          <div class="row g-3">
+            {% for template in templates %}
+              <div class="col-6 col-md-4 mb-3">
+                <label class="w-100 m-0">
+                  <div class="card template-card shadow">
+                    <img
+                      src="{{ template.preview_image.url }}"
+                      class="card-img-top">
+
+                    <div class="card-body text-center">
+                      <h5>{{ template.name }}</h5>
+
+                      <input
+                        type="radio"
+                        name="selected_template"
+                        value="{{ template.id }}"
+                        required>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            {% endfor %}
+          </div>
+
+          <hr class="my-5">
+
+          <h3 class="section-title">Personal Information</h3>
+
+          <input
+            type="text"
+            name="name"
+            class="form-control mb-3"
+            placeholder="Full Name"
+            required>
+
+          <input
+            type="email"
+            name="email"
+            class="form-control mb-3"
+            placeholder="Email Address"
+            required>
+
+          <input
+            type="text"
+            name="phone"
+            class="form-control mb-3"
+            placeholder="Phone Number"
+            required>
+
+          <input
+            type="text"
+            name="linkedin"
+            class="form-control mb-3"
+            placeholder="LinkedIn URL">
+
+          <input
+            type="text"
+            name="github"
+            class="form-control mb-3"
+            placeholder="GitHub URL">
+
+          <input
+            type="text"
+            name="location"
+            class="form-control mb-3"
+            placeholder="Location">
+
+          <hr class="my-5">
+
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="section-title mb-0">Professional Summary</h3>
+            <button
+              type="button"
+              class="btn btn-warning btn-sm fw-medium px-3"
+              style="border-radius: 8px;"
+              onclick="generateSummary()">
+              ✨ Generate Summary with AI
+            </button>
+          </div>
+
+          <textarea
+            id="summary"
+            name="summary"
+            rows="5"
+            class="form-control mb-4"
+            placeholder="Write a short professional summary"></textarea>
+
+          <h3 class="section-title">Skills</h3>
+
+          <textarea
+            name="skills"
+            rows="4"
+            class="form-control mb-4"
+            placeholder="Python, SQL, Power BI, React, Django..."></textarea>
+
+          <h3 class="section-title">Education</h3>
+
+          <textarea
+            name="education"
+            rows="5"
+            class="form-control mb-4"
+            placeholder="Degree, College, CGPA, Year"></textarea>
+
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="section-title mb-0">Projects</h3>
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm px-3"
+              style="border-radius: 8px;"
+              onclick="addProject()">
+              + Add Project
+            </button>
+          </div>
+
+          <div id="projects-container" class="mb-4">
+            <div class="project-card mb-3 p-3 border rounded">
+                <input
+                    type="text"
+                    name="project_name[]"
+                    class="form-control mb-2"
+                    placeholder="Project Name">
+
+                <input
+                    type="text"
+                    name="project_stack[]"
+                    class="form-control mb-2"
+                    placeholder="Tech Stack">
+
+                <textarea
+                    name="project_description[]"
+                    class="form-control"
+                    rows="3"
+                    placeholder="Project Description"></textarea>
+            </div>
+          </div>
+
+          <h3 class="section-title">Experience</h3>
+
+          <textarea
+            name="experience"
+            rows="5"
+            class="form-control mb-4"
+            placeholder="Internships, Work Experience"></textarea>
+
+          <h3 class="section-title">Certifications</h3>
+
+          <textarea
+            name="certifications"
+            rows="4"
+            class="form-control mb-5"
+            placeholder="AWS, IBM, Cisco, etc"></textarea>
+
+          <div class="text-center">
+            <button type="submit" class="btn btn-success btn-lg px-5 py-3 fw-bold" style="border-radius: 10px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
+              Generate Resume
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function addProject(){
+        let container = document.getElementById("projects-container");
+        let html = `
+        <div class="project-card mb-3 p-3 border rounded">
+            <input
+                type="text"
+                name="project_name[]"
+                class="form-control mb-2"
+                placeholder="Project Name">
+
+            <input
+                type="text"
+                name="project_stack[]"
+                class="form-control mb-2"
+                placeholder="Tech Stack">
+
+            <textarea
+                name="project_description[]"
+                class="form-control"
+                rows="3"
+                placeholder="Project Description"></textarea>
+        </div>`;
+        container.insertAdjacentHTML("beforeend", html);
+    }
+  </script>
+
+  <script>
+    async function generateSummary(){
+        let skills = document.querySelector('[name="skills"]').value;
+        let projects = document.querySelector('[name="projects"]')?.value || "";
+        let experience = document.querySelector('[name="experience"]').value;
+
+        let response = await fetch(
+            "/generate-summary/",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json",
+                    "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body:JSON.stringify({
+                    skills:skills,
+                    projects:projects,
+                    experience:experience
+                })
+            }
+        );
+
+        let data = await response.json();
+        document.getElementById("summary").value = data.summary;
+    }
+  </script>
+</body>
+</html>

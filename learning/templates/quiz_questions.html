@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ course_name }} Quiz Questions</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+    :root{
+        --bg:#0b0c14;
+        --bg-soft:#11131f;
+        --card:#161826;
+        --card-hover:#1c1f30;
+        --line:#262a3d;
+        --ink:#eef0fb;
+        --muted:#8a8da3;
+        --indigo:#6c63ff;
+        --indigo-soft:#2a2660;
+        --amber:#f5a524;
+        --easy:#2bb673;
+        --medium:#f5a524;
+        --hard:#ef4a48;
+    }
+
+    *{
+        box-sizing:border-box;
+    }
+
+    body{
+        margin:0;
+        background:
+            radial-gradient(900px 500px at 85% -10%, rgba(108,99,255,0.16), transparent 60%),
+            var(--bg);
+        font-family:'Inter', sans-serif;
+        color:var(--ink);
+        -webkit-font-smoothing:antialiased;
+    }
+
+    .wrap{
+        max-width:760px;
+        margin:0 auto;
+        padding:40px 22px 100px;
+    }
+
+    /* ---------- TOP BAR ---------- */
+
+    .topbar{
+        position:sticky;
+        top:0;
+        z-index:10;
+        background:rgba(11,12,20,0.85);
+        backdrop-filter:blur(10px);
+        border-bottom:1px solid var(--line);
+        margin:0 -22px 28px;
+        padding:18px 22px;
+    }
+
+    .topbar-inner{
+        max-width:760px;
+        margin:0 auto;
+    }
+
+    .topbar-row{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        margin-bottom:12px;
+    }
+
+    .title-block h1{
+        font-family:'Sora', sans-serif;
+        font-size:18px;
+        font-weight:700;
+        margin:0 0 4px;
+        letter-spacing:-0.01em;
+    }
+
+    .meta-tags{
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+    }
+
+    .tag{
+        font-size:11.5px;
+        font-weight:600;
+        padding:4px 10px;
+        border-radius:999px;
+        letter-spacing:.02em;
+    }
+
+    .tag.diff-easy{ background:rgba(43,182,115,0.15); color:var(--easy); border:1px solid rgba(43,182,115,0.35); }
+    .tag.diff-medium{ background:rgba(245,165,36,0.15); color:var(--amber); border:1px solid rgba(245,165,36,0.35); }
+    .tag.diff-hard{ background:rgba(239,74,72,0.15); color:var(--hard); border:1px solid rgba(239,74,72,0.35); }
+    .tag.count{ background:rgba(108,99,255,0.15); color:#b3aeff; border:1px solid rgba(108,99,255,0.35); }
+
+    .progress-track{
+        height:6px;
+        width:100%;
+        background:var(--line);
+        border-radius:999px;
+        overflow:hidden;
+    }
+
+    .progress-fill{
+        height:100%;
+        background:linear-gradient(90deg, var(--indigo), #9b8bff);
+        border-radius:999px;
+        transition:width .25s ease;
+    }
+
+    .progress-label{
+        font-size:11.5px;
+        color:var(--muted);
+        margin-top:8px;
+        display:flex;
+        justify-content:space-between;
+    }
+
+    /* ---------- QUESTION CARD ---------- */
+
+    .q-card{
+        background:var(--card);
+        border:1px solid var(--line);
+        border-radius:18px;
+        padding:26px 26px 22px;
+        margin-bottom:18px;
+        transition:border-color .15s ease;
+    }
+
+    .q-card:hover{
+        border-color:#33374f;
+    }
+
+    .q-head{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        margin-bottom:14px;
+    }
+
+    .q-num{
+        font-family:'Sora', sans-serif;
+        font-weight:800;
+        font-size:13px;
+        color:var(--indigo);
+        background:var(--indigo-soft);
+        width:30px;
+        height:30px;
+        border-radius:10px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        flex-shrink:0;
+    }
+
+    .q-text{
+        font-size:16px;
+        font-weight:500;
+        line-height:1.5;
+        margin:0;
+        color:var(--ink);
+    }
+
+    .options{
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+        margin-left:42px;
+    }
+
+    .option{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        padding:13px 16px;
+        border:1.5px solid var(--line);
+        border-radius:12px;
+        background:var(--bg-soft);
+        cursor:pointer;
+        transition:border-color .15s ease, background .15s ease;
+        position:relative;
+    }
+
+    .option:hover{
+        border-color:#3a3f5c;
+        background:var(--card-hover);
+    }
+
+    .option input[type="radio"]{
+        position:absolute;
+        opacity:0;
+        width:0;
+        height:0;
+    }
+
+    .radio-dot{
+        width:18px;
+        height:18px;
+        border-radius:50%;
+        border:2px solid #3a3f5c;
+        flex-shrink:0;
+        position:relative;
+        transition:border-color .15s ease;
+    }
+
+    .option input[type="radio"]:checked ~ .radio-dot{
+        border-color:var(--indigo);
+    }
+
+    .option input[type="radio"]:checked ~ .radio-dot::after{
+        content:"";
+        position:absolute;
+        inset:3px;
+        border-radius:50%;
+        background:var(--indigo);
+    }
+
+    .option-label{
+        font-size:14.5px;
+        color:#d6d8ea;
+        line-height:1.4;
+    }
+
+    .option:has(input[type="radio"]:checked){
+        border-color:var(--indigo);
+        background:rgba(108,99,255,0.08);
+    }
+
+    .option:has(input[type="radio"]:checked) .option-label{
+        color:var(--ink);
+        font-weight:500;
+    }
+
+    /* ---------- SUBMIT BAR ---------- */
+
+    .submit-bar{
+        position:sticky;
+        bottom:0;
+        margin:32px -22px 0;
+        padding:18px 22px 28px;
+        background:linear-gradient(180deg, transparent, var(--bg) 30%);
+    }
+
+    .submit-inner{
+        max-width:760px;
+        margin:0 auto;
+    }
+
+    .submit-btn{
+        appearance:none;
+        border:none;
+        width:100%;
+        background:linear-gradient(135deg, var(--indigo), #4f46e5);
+        color:#fff;
+        font-family:'Sora', sans-serif;
+        font-weight:700;
+        font-size:16px;
+        padding:17px;
+        border-radius:14px;
+        cursor:pointer;
+        box-shadow:0 18px 36px -16px rgba(108,99,255,0.55);
+        transition:transform .15s ease, box-shadow .15s ease;
+    }
+
+    .submit-btn:hover{
+        transform:translateY(-1px);
+        box-shadow:0 22px 40px -16px rgba(108,99,255,0.65);
+    }
+
+    .submit-btn:active{
+        transform:translateY(0);
+    }
+
+    .answered-note{
+        text-align:center;
+        font-size:12.5px;
+        color:var(--muted);
+        margin-top:10px;
+    }
+
+    /* ---------- BACK LINK ---------- */
+
+    .back-row{
+        text-align:center;
+        margin-top:18px;
+    }
+
+    .back-link{
+        color:var(--muted);
+        font-size:13.5px;
+        font-weight:500;
+        text-decoration:none;
+    }
+
+    .back-link:hover{
+        color:var(--ink);
+    }
+
+    @media (max-width:560px){
+        .options{ margin-left:0; }
+        .q-card{ padding:20px 18px; }
+    }
+
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+    <div class="topbar">
+        <div class="topbar-inner">
+            <div class="topbar-row">
+                <div class="title-block">
+                    <h1>{{ course_name }} Quiz</h1>
+                    <div class="meta-tags">
+                        <span class="tag diff-{{ difficulty|lower }}">{{ difficulty }}</span>
+                        <span class="tag count">{{ questions|length }} Questions</span>
+                    </div>
+                </div>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill" style="width:0%"></div>
+            </div>
+            <div class="progress-label">
+                <span id="answeredCount">0</span>
+                <span>of {{ questions|length }} answered</span>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" id="quizForm">
+
+        {% csrf_token %}
+
+        {% for q in questions %}
+
+        <div class="q-card">
+
+            <div class="q-head">
+                <span class="q-num">{{ forloop.counter }}</span>
+                <p class="q-text">{{ q.question }}</p>
+            </div>
+
+            <div class="options">
+
+                {% for option in q.options %}
+
+                <label class="option">
+                    <input
+                        type="radio"
+                        name="question{{ forloop.parentloop.counter }}"
+                        value="{{ option }}"
+                        onchange="updateProgress()">
+                    <span class="radio-dot"></span>
+                    <span class="option-label">{{ option }}</span>
+                </label>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+        <div class="submit-bar">
+            <div class="submit-inner">
+                <button type="submit" class="submit-btn">Submit Quiz</button>
+                <p class="answered-note">You can review answers before submitting — there's no time limit.</p>
+            </div>
+        </div>
+
+    </form>
+
+    <div class="back-row">
+        <a href="/learning/{{ course_slug }}/quiz/" class="back-link">← Back to quiz settings</a>
+    </div>
+
+</div>
+
+<script id="quiz-data" data-total="{{ questions|length }}"></script>
+<script>
+    const totalQuestions = parseInt(document.getElementById('quiz-data').dataset.total, 10);
+
+    function updateProgress(){
+        const groups = {};
+        document.querySelectorAll('#quizForm input[type="radio"]:checked').forEach(input => {
+            groups[input.name] = true;
+        });
+        const answered = Object.keys(groups).length;
+        const pct = totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0;
+
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('answeredCount').textContent = answered;
+    }
+</script>
+
+</body>
+</html>

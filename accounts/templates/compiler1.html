@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeForge Pro — Multi-Language Compiler</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--bg4:#0d1117;
+  --border:#2d3748;--border2:#334155;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#64748b;
+  --accent:#7c3aed;--accent2:#6d28d9;
+  --green:#065f46;--green2:#6ee7b7;--green3:#047857;
+  --red:#450a0a;--red2:#fca5a5;
+  --blue2:#93c5fd;--amber:#78350f;--amber2:#fcd34d;
+  --radius:8px;
+}
+.light{
+  --bg:#f8fafc;--bg2:#f1f5f9;--bg3:#e2e8f0;--bg4:#ffffff;
+  --border:#cbd5e1;--text:#0f172a;--text2:#475569;--text3:#94a3b8;
+  --green:#dcfce7;--green2:#16a34a;--green3:#bbf7d0;
+  --red:#fef2f2;--red2:#dc2626;--blue2:#2563eb;--amber:#fffbeb;--amber2:#d97706;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;transition:background .2s,color .2s}
+#topbar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
+.logo{font-weight:700;font-size:15px;color:var(--accent);letter-spacing:.5px;margin-right:4px}
+select{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:5px 10px;font-size:13px;cursor:pointer}
+select:focus{outline:none;border-color:var(--accent)}
+button{border:none;border-radius:var(--radius);padding:6px 13px;font-size:13px;cursor:pointer;font-weight:500;transition:all .15s;display:flex;align-items:center;gap:5px}
+#runBtn{background:var(--accent);color:#fff}
+#runBtn:hover{background:var(--accent2)}
+#runBtn:disabled{opacity:.5;cursor:not-allowed}
+#aiBtn{background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff}
+#aiBtn:hover{opacity:.88}
+#fixBtn{background:var(--green);color:var(--green2);border:1px solid var(--green3)}
+#shareBtn{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+#shareBtn:hover{border-color:var(--accent);color:var(--accent)}
+#themeBtn{background:var(--bg3);color:var(--text);border:1px solid var(--border);padding:6px 10px;font-size:16px}
+#clearBtn{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}
+.badge-ok{background:#064e3b;color:#6ee7b7}
+.light .badge-ok{background:#dcfce7;color:#16a34a}
+.badge-err{background:#450a0a;color:#fca5a5}
+.light .badge-err{background:#fef2f2;color:#dc2626}
+.badge-run{background:#312e81;color:#a5b4fc}
+.light .badge-run{background:#eff6ff;color:#2563eb}
+#main{display:flex;flex:1;overflow:hidden}
+#editorWrap{flex:1;display:flex;flex-direction:column;min-width:0}
+#editorHeader{display:flex;align-items:center;justify-content:space-between;padding:5px 12px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text3)}
+#editor{flex:1}
+#rightPanel{width:360px;display:flex;flex-direction:column;border-left:1px solid var(--border);background:var(--bg4)}
+#outputHeader{padding:7px 14px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px}
+#output{flex:1;overflow-y:auto;padding:12px 14px;font-family:'Cascadia Code','Fira Code',monospace;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:var(--text)}
+#output.ok{color:#6ee7b7}.light #output.ok{color:#16a34a}
+#output.err{color:#fca5a5}.light #output.err{color:#dc2626}
+#output.info{color:var(--blue2)}
+#aiPanel{border-top:1px solid var(--border);display:flex;flex-direction:column;max-height:200px}
+#aiHeader{padding:6px 14px;background:var(--bg2);font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+#aiOutput{flex:1;overflow-y:auto;padding:10px 14px;font-size:13px;line-height:1.6;color:var(--text);background:var(--bg4)}
+#diagPanel{border-top:1px solid var(--border);max-height:120px;overflow-y:auto}
+#diagHeader{padding:5px 14px;background:var(--bg2);font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+.diag-item{display:flex;align-items:flex-start;gap:8px;padding:5px 14px;border-bottom:1px solid var(--border);font-size:12px;cursor:pointer}
+.diag-item:hover{background:var(--bg3)}
+.diag-msg{color:var(--text);line-height:1.4}.diag-loc{color:var(--text3);font-size:11px}
+#stdinWrap{border-top:1px solid var(--border);padding:7px 14px;background:var(--bg4)}
+#stdinLabel{font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+#stdin{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:monospace;font-size:12px;padding:5px 8px;resize:none;height:44px}
+#stdin:focus{outline:none;border-color:var(--accent)}
+#statusBar{padding:3px 16px;background:var(--bg2);border-top:1px solid var(--border);font-size:11px;color:var(--text3);display:flex;gap:16px;flex-shrink:0}
+#shareModal{display:none;position:fixed;inset:0;background:#00000088;z-index:9999;align-items:center;justify-content:center}
+#shareModal.show{display:flex}
+#shareBox{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;width:420px;max-width:95vw}
+#shareBox h3{font-size:15px;font-weight:600;margin-bottom:14px;color:var(--text)}
+#shareUrl{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:monospace;font-size:12px;padding:8px;margin-bottom:10px;resize:none;height:72px}
+.share-btns{display:flex;gap:8px}
+.sbtn{flex:1;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text);cursor:pointer;font-size:13px;font-weight:500}
+.sbtn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.sbtn:hover{opacity:.85}
+</style>
+</head>
+<body>
+<div id="topbar">
+  <span class="logo">⚡ CodeForge Pro</span>
+  <select id="langSelect">
+    <option value="python">🐍 Python</option>
+    <option value="javascript">🟨 JavaScript</option>
+    <option value="c">🔵 C</option>
+    <option value="cpp">🔷 C++</option>
+    <option value="java">☕ Java</option>
+    <option value="typescript">🔹 TypeScript</option>
+    <option value="go">🐹 Go</option>
+    <option value="rust">🦀 Rust</option>
+    <option value="php">🐘 PHP</option>
+    <option value="ruby">💎 Ruby</option>
+  </select>
+  <button id="runBtn">▶ Run</button>
+  <button id="aiBtn">✦ AI Explain</button>
+  <button id="fixBtn">⚡ Fix Errors</button>
+  <button id="shareBtn">🔗 Share</button>
+  <button id="themeBtn">🌙</button>
+  <button id="clearBtn">Clear</button>
+  <span id="statusBadge" class="badge badge-ok">Ready</span>
+</div>
+
+<div id="main">
+  <div id="editorWrap">
+    <div id="editorHeader">
+      <span id="fileName">main.py</span>
+      <span id="cursorPos">Ln 1, Col 1</span>
+    </div>
+    <div id="editor"></div>
+  </div>
+  <div id="rightPanel">
+    <div id="outputHeader">
+      <span>Output</span>
+      <span id="outBadge" class="badge badge-run">idle</span>
+    </div>
+    <div id="output" class="info">// Run your code to see output here
+//
+// Ctrl+Enter  → Run
+// ✦ AI Explain → analyze your code
+// 🔗 Share     → shareable link</div>
+    <div id="aiPanel">
+      <div id="aiHeader">✦ AI Assistant</div>
+      <div id="aiOutput">Click <strong>✦ AI Explain</strong> to get AI-powered analysis and suggestions.</div>
+    </div>
+    <div id="diagPanel">
+      <div id="diagHeader">Diagnostics <span id="diagCount" style="color:var(--accent)"></span></div>
+      <div id="diagList"></div>
+    </div>
+    <div id="stdinWrap">
+      <div id="stdinLabel">Stdin Input</div>
+      <textarea id="stdin" placeholder="Enter input for your program..."></textarea>
+    </div>
+  </div>
+</div>
+
+<div id="statusBar">
+  <span id="langInfo">Python 3.10</span>
+  <span>UTF-8</span>
+  <span id="indentInfo">Spaces: 4</span>
+  <span id="diagInfo" style="color:#fca5a5"></span>
+</div>
+
+<div id="shareModal">
+  <div id="shareBox">
+    <h3>🔗 Share Your Code</h3>
+    <textarea id="shareUrl" readonly></textarea>
+    <div class="share-btns">
+      <button class="sbtn" onclick="closeShare()">Cancel</button>
+      <button class="sbtn primary" onclick="copyShare()">Copy Link</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Language configs ───────────────────────────────────────────────────────
+const LANG_META = {
+  python:     { judge:'71', file:'main.py',    monacoLang:'python',     info:'Python 3.10', indent:'Spaces: 4' },
+  javascript: { judge:'63', file:'main.js',    monacoLang:'javascript', info:'Node 12',     indent:'Spaces: 2' },
+  c:          { judge:'50', file:'main.c',     monacoLang:'c',          info:'GCC 9.2',     indent:'Spaces: 4' },
+  cpp:        { judge:'54', file:'main.cpp',   monacoLang:'cpp',        info:'G++ 9.2',     indent:'Spaces: 4' },
+  java:       { judge:'62', file:'Main.java',  monacoLang:'java',       info:'JDK 13',      indent:'Spaces: 4' },
+  typescript: { judge:'74', file:'main.ts',    monacoLang:'typescript', info:'TS 3.7',      indent:'Spaces: 2' },
+  go:         { judge:'60', file:'main.go',    monacoLang:'go',         info:'Go 1.13',     indent:'Tabs' },
+  rust:       { judge:'73', file:'main.rs',    monacoLang:'rust',       info:'Rust 1.40',   indent:'Spaces: 4' },
+  php:        { judge:'68', file:'main.php',   monacoLang:'php',        info:'PHP 7.4',     indent:'Spaces: 4' },
+  ruby:       { judge:'72', file:'main.rb',    monacoLang:'ruby',       info:'Ruby 2.7',    indent:'Spaces: 2' },
+};
+
+// Judge0 public instance — works from any domain, no CORS issues
+const JUDGE0_URL = 'https://judge0-ce.p.rapidapi.com';
+// Use the free public endpoint (no key needed for basic use)
+const JUDGE0_FREE = 'https://ce.judge0.com';
+
+const STARTERS = {
+  python:`# Python - CodeForge Pro
+def greet(name):
+    print(f"Hello, {name}!")
+
+greet("World")
+`,
+  javascript:`// JavaScript - CodeForge Pro
+function greet(name) {
+  console.log(\`Hello, \${name}!\`);
+}
+greet("World");
+`,
+  c:`#include <stdio.h>
+int main() {
+    printf("Hello, World!\\n");
+    return 0;
+}
+`,
+  cpp:`#include <iostream>
+using namespace std;
+int main() {
+    cout << "Hello, World!" << endl;
+    return 0;
+}
+`,
+  java:`public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+`,
+  typescript:`const greet = (name: string): void => {
+  console.log(\`Hello, \${name}!\`);
+};
+greet("World");
+`,
+  go:`package main
+import "fmt"
+func main() {
+    fmt.Println("Hello, World!")
+}
+`,
+  rust:`fn main() {
+    println!("Hello, World!");
+}
+`,
+  php:`<?php
+echo "Hello, World!\\n";
+?>`,
+  ruby:`def greet(name)
+  puts "Hello, #{name}!"
+end
+greet("World")`
+};
+
+let editor, monacoInst, currentLang = 'python', isDark = true;
+
+// ─── Monaco setup ────────────────────────────────────────────────────────────
+require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
+require(['vs/editor/editor.main'], function(monaco) {
+  monacoInst = monaco;
+  editor = monaco.editor.create(document.getElementById('editor'), {
+    value: STARTERS.python, language: 'python', theme: 'vs-dark',
+    fontSize: 14, fontFamily: "'Cascadia Code','Fira Code',monospace", fontLigatures: true,
+    minimap: { enabled: false }, scrollBeyondLastLine: false, automaticLayout: true,
+    suggestOnTriggerCharacters: true, quickSuggestions: { other: true, comments: false, strings: false },
+    parameterHints: { enabled: true }, wordBasedSuggestions: true,
+    tabSize: 4, insertSpaces: true, formatOnType: true,
+    bracketPairColorization: { enabled: true }, guides: { bracketPairs: true, indentation: true },
+    renderWhitespace: 'boundary', smoothScrolling: true, cursorBlinking: 'smooth', padding: { top: 12 }
+  });
+
+  editor.onDidChangeCursorPosition(e => {
+    document.getElementById('cursorPos').textContent = `Ln ${e.position.lineNumber}, Col ${e.position.column}`;
+  });
+  editor.onDidChangeModelContent(() => { clearTimeout(window._lt); window._lt = setTimeout(runLint, 600); });
+
+  // Register completions for all languages
+  Object.keys(LANG_META).forEach(lang => {
+    monaco.languages.registerCompletionItemProvider(LANG_META[lang].monacoLang, {
+      triggerCharacters: ['.', '(', '[', ' '],
+      provideCompletionItems: (model, pos) => {
+        const word = model.getWordUntilPosition(pos);
+        const range = { startLineNumber: pos.lineNumber, endLineNumber: pos.lineNumber, startColumn: word.startColumn, endColumn: word.endColumn };
+        return { suggestions: getSnippets(lang, range, monaco) };
+      }
+    });
+  });
+
+  editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runCode);
+  loadFromHash();
+  runLint();
+});
+
+// ─── UI events ───────────────────────────────────────────────────────────────
+document.getElementById('langSelect').addEventListener('change', e => {
+  currentLang = e.target.value;
+  const meta = LANG_META[currentLang];
+  monacoInst.editor.setModelLanguage(editor.getModel(), meta.monacoLang);
+  editor.setValue(STARTERS[currentLang]);
+  document.getElementById('fileName').textContent = meta.file;
+  document.getElementById('langInfo').textContent = meta.info;
+  document.getElementById('indentInfo').textContent = meta.indent;
+  editor.updateOptions({ tabSize: meta.indent.includes('Tab') ? 2 : 4, insertSpaces: !meta.indent.includes('Tab') });
+  clearDiag();
+  setOutput('// Ready — ' + meta.info, 'info');
+  setBadge('idle');
+});
+
+document.getElementById('runBtn').addEventListener('click', runCode);
+document.getElementById('aiBtn').addEventListener('click', aiExplain);
+document.getElementById('fixBtn').addEventListener('click', fixErrors);
+document.getElementById('shareBtn').addEventListener('click', shareCode);
+document.getElementById('clearBtn').addEventListener('click', () => { editor.setValue(''); clearDiag(); });
+document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+document.getElementById('shareModal').addEventListener('click', e => { if (e.target === document.getElementById('shareModal')) closeShare(); });
+
+// ─── Theme ───────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  isDark = !isDark;
+  document.body.classList.toggle('light', !isDark);
+  document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
+  monacoInst.editor.setTheme(isDark ? 'vs-dark' : 'vs');
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+function setOutput(text, cls = '') { const el = document.getElementById('output'); el.textContent = text; el.className = cls; }
+function setAI(html) { document.getElementById('aiOutput').innerHTML = html; }
+function setBadge(state, text) {
+  const b = document.getElementById('outBadge');
+  b.className = 'badge badge-' + (state === 'success' ? 'ok' : state === 'error' ? 'err' : 'run');
+  b.textContent = text || { idle: 'idle', running: 'running...', success: 'success', error: 'error', fixed: 'fixed' }[state] || state;
+}
+function clearDiag() {
+  document.getElementById('diagList').innerHTML = '';
+  document.getElementById('diagCount').textContent = '';
+  document.getElementById('diagInfo').textContent = '';
+  if (monacoInst && editor) monacoInst.editor.setModelMarkers(editor.getModel(), 'codeforge', []);
+}
+
+// ─── Snippets ────────────────────────────────────────────────────────────────
+function getSnippets(lang, range, monaco) {
+  const K = monaco.languages.CompletionItemKind;
+  const s = (label, kind, insert, doc) => ({ label, kind, insertText: insert, insertTextRules: 4, range, documentation: doc || '' });
+  const map = {
+    python: [
+      s('print', K.Function, 'print(${1:value})', 'Print to stdout'),
+      s('len', K.Function, 'len(${1:obj})'), s('range', K.Function, 'range(${1:stop})'),
+      s('input', K.Function, 'input(${1:"prompt: "})'),
+      s('def', K.Snippet, 'def ${1:name}(${2:args}):\n\t${3:pass}'),
+      s('class', K.Snippet, 'class ${1:Name}:\n\tdef __init__(self):\n\t\t${2:pass}'),
+      s('for-in', K.Snippet, 'for ${1:item} in ${2:iterable}:\n\t${3:pass}'),
+      s('while', K.Snippet, 'while ${1:condition}:\n\t${2:pass}'),
+      s('try-except', K.Snippet, 'try:\n\t${1:pass}\nexcept ${2:Exception} as e:\n\t${3:print(e)}'),
+      s('if-elif-else', K.Snippet, 'if ${1:cond}:\n\t${2:pass}\nelif ${3:cond}:\n\t${4:pass}\nelse:\n\t${5:pass}'),
+      s('list-comp', K.Snippet, '[${1:expr} for ${2:x} in ${3:iterable}]'),
+      s('dict-comp', K.Snippet, '{${1:k}: ${2:v} for ${3:k}, ${4:v} in ${5:items}}'),
+      s('lambda', K.Snippet, 'lambda ${1:args}: ${2:expr}'),
+      s('f-string', K.Snippet, 'f"${1:text} {${2:var}}"'),
+      s('import', K.Keyword, 'import ${1:module}'),
+      s('from-import', K.Keyword, 'from ${1:module} import ${2:name}'),
+      s('with-open', K.Snippet, 'with open("${1:file}", "${2:r}") as f:\n\t${3:data = f.read()}'),
+    ],
+    javascript: [
+      s('console.log', K.Function, 'console.log(${1:value});'),
+      s('const', K.Keyword, 'const ${1:name} = ${2:value};'),
+      s('let', K.Keyword, 'let ${1:name} = ${2:value};'),
+      s('arrow-fn', K.Snippet, 'const ${1:name} = (${2:args}) => {\n\t${3}\n};'),
+      s('async-fn', K.Snippet, 'async function ${1:name}(${2:args}) {\n\t${3}\n}'),
+      s('fetch', K.Snippet, 'const res = await fetch("${1:url}");\nconst data = await res.json();'),
+      s('try-catch', K.Snippet, 'try {\n\t${1}\n} catch (${2:err}) {\n\tconsole.error(${2:err});\n}'),
+      s('forEach', K.Method, '.forEach((${1:item}) => {\n\t${2}\n})'),
+      s('map', K.Method, '.map((${1:item}) => ${2:item})'),
+      s('filter', K.Method, '.filter((${1:item}) => ${2:condition})'),
+      s('promise', K.Snippet, 'new Promise((resolve, reject) => {\n\t${1}\n})'),
+    ],
+    cpp: [
+      s('cout', K.Function, 'cout << ${1:value} << endl;'),
+      s('cin', K.Function, 'cin >> ${1:var};'),
+      s('for', K.Snippet, 'for (int ${1:i} = 0; ${1:i} < ${2:n}; ${1:i}++) {\n\t${3}\n}'),
+      s('while', K.Snippet, 'while (${1:condition}) {\n\t${2}\n}'),
+      s('vector', K.Snippet, 'vector<${1:int}> ${2:v};'),
+      s('class', K.Snippet, 'class ${1:Name} {\npublic:\n\t${2}\n};'),
+      s('#include', K.Keyword, '#include <${1:iostream}>'),
+      s('sort', K.Function, 'sort(${1:v}.begin(), ${1:v}.end());'),
+    ],
+    java: [
+      s('sout', K.Function, 'System.out.println(${1:value});'),
+      s('for', K.Snippet, 'for (int ${1:i} = 0; ${1:i} < ${2:n}; ${1:i}++) {\n\t${3}\n}'),
+      s('for-each', K.Snippet, 'for (${1:String} ${2:item} : ${3:list}) {\n\t${4}\n}'),
+      s('method', K.Snippet, 'public ${1:void} ${2:name}(${3:args}) {\n\t${4}\n}'),
+      s('try-catch', K.Snippet, 'try {\n\t${1}\n} catch (${2:Exception} e) {\n\te.printStackTrace();\n}'),
+      s('ArrayList', K.Snippet, 'ArrayList<${1:String}> ${2:list} = new ArrayList<>();'),
+      s('HashMap', K.Snippet, 'HashMap<${1:String}, ${2:Integer}> ${3:map} = new HashMap<>();'),
+    ],
+    c: [
+      s('printf', K.Function, 'printf("${1:%s}\\n", ${2:var});'),
+      s('scanf', K.Function, 'scanf("${1:%d}", &${2:var});'),
+      s('for', K.Snippet, 'for (int ${1:i} = 0; ${1:i} < ${2:n}; ${1:i}++) {\n\t${3}\n}'),
+      s('while', K.Snippet, 'while (${1:condition}) {\n\t${2}\n}'),
+      s('struct', K.Snippet, 'struct ${1:Name} {\n\t${2:int field};\n};'),
+      s('#include', K.Keyword, '#include <${1:stdio.h}>'),
+      s('malloc', K.Function, '${1:int}* ${2:ptr} = malloc(${3:n} * sizeof(${1:int}));'),
+    ],
+  };
+  return map[lang] || [];
+}
+
+// ─── Lint ─────────────────────────────────────────────────────────────────────
+function runLint() {
+  if (!editor || !monacoInst) return;
+  const code = editor.getValue(), errors = [], lines = code.split('\n');
+  if (currentLang === 'python') {
+    let prev = 0;
+    lines.forEach((line, i) => {
+      if (!line.trim()) return;
+      const ind = line.length - line.trimStart().length;
+      if (ind % 4 !== 0 && ind > 0) errors.push({ line: i + 1, col: 1, msg: `Indentation: expected multiple of 4 spaces, got ${ind}`, sev: 'warning' });
+      if (ind - prev > 4) errors.push({ line: i + 1, col: 1, msg: `Unexpected indentation jump`, sev: 'error' });
+      const t = line.trim();
+      if (t.match(/^(if|elif|else|for|while|def|class|try|except|finally|with)\b/) && !t.endsWith(':') && !t.endsWith('\\'))
+        errors.push({ line: i + 1, col: line.length, msg: `Missing ':' at end of block statement`, sev: 'error' });
+      if (t.startsWith('print ') && !t.startsWith('print('))
+        errors.push({ line: i + 1, col: 1, msg: `Python 3: use print() with parentheses`, sev: 'warning' });
+      if (line.trim()) prev = ind;
+    });
+  }
+  if (currentLang === 'java' && !code.includes('public class Main'))
+    errors.push({ line: 1, col: 1, msg: `Java requires 'public class Main'`, sev: 'warning' });
+
+  // Bracket balancing
+  const br = { '{': '}', '(': ')', '[': ']' };
+  const stack = []; let inStr = false, sc = '';
+  for (let i = 0; i < code.length; i++) {
+    const c = code[i];
+    if (inStr) { if (c === sc && code[i - 1] !== '\\') inStr = false; continue; }
+    if (c === '"' || c === "'") { inStr = true; sc = c; continue; }
+    if (br[c]) stack.push({ ch: c, pos: i });
+    else if (c === '}' || c === ']' || c === ')') {
+      const exp = stack.length ? br[stack[stack.length - 1].ch] : null;
+      if (!exp || exp !== c) { const ln = code.substring(0, i).split('\n').length; errors.push({ line: ln, col: 1, msg: `Unmatched '${c}'`, sev: 'error' }); }
+      else stack.pop();
+    }
+  }
+  if (stack.length) { const { ch, pos } = stack[stack.length - 1]; const ln = code.substring(0, pos).split('\n').length; errors.push({ line: ln, col: 1, msg: `Unclosed '${ch}' — expected '${br[ch]}'`, sev: 'error' }); }
+  renderDiag(errors);
+}
+
+function renderDiag(errors) {
+  const list = document.getElementById('diagList'); list.innerHTML = '';
+  document.getElementById('diagCount').textContent = errors.length ? `(${errors.length})` : '';
+  document.getElementById('diagInfo').textContent = errors.length ? `${errors.length} issue${errors.length > 1 ? 's' : ''}` : '';
+  const markers = [];
+  errors.forEach(e => {
+    const item = document.createElement('div'); item.className = 'diag-item';
+    item.innerHTML = `<span>${e.sev === 'error' ? '🔴' : '🟡'}</span><div><div class="diag-msg">${e.msg}</div><div class="diag-loc">Line ${e.line}</div></div>`;
+    item.onclick = () => { editor.revealLineInCenter(e.line); editor.setPosition({ lineNumber: e.line, column: 1 }); editor.focus(); };
+    list.appendChild(item);
+    markers.push({ startLineNumber: e.line, endLineNumber: e.line, startColumn: 1, endColumn: 999, message: e.msg, severity: e.sev === 'error' ? monacoInst.MarkerSeverity.Error : monacoInst.MarkerSeverity.Warning });
+  });
+  if (monacoInst && editor) monacoInst.editor.setModelMarkers(editor.getModel(), 'codeforge', markers);
+  const badge = document.getElementById('statusBadge');
+  if (errors.some(e => e.sev === 'error')) { badge.className = 'badge badge-err'; badge.textContent = 'Errors'; }
+  else if (errors.length) { badge.className = 'badge'; badge.style.cssText = 'background:var(--amber);color:var(--amber2)'; badge.textContent = 'Warnings'; }
+  else { badge.className = 'badge badge-ok'; badge.textContent = 'No issues'; badge.style.cssText = ''; }
+}
+
+// ─── Run Code via Judge0 (CORS-safe) ─────────────────────────────────────────
+async function runCode() {
+  const code = editor.getValue().trim();
+  if (!code) { setOutput('// Nothing to run', 'info'); return; }
+  const meta = LANG_META[currentLang];
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true; btn.textContent = '⏳ Running...';
+  setBadge('running'); setOutput('// Compiling and running...', 'info');
+  const stdin = document.getElementById('stdin').value;
+
+  try {
+    // Submit to Judge0
+    const submitRes = await fetch(`${JUDGE0_FREE}/submissions?base64_encoded=false&wait=true`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        source_code: code,
+        language_id: parseInt(meta.judge),
+        stdin: stdin || '',
+        cpu_time_limit: 10,
+        memory_limit: 128000
+      })
+    });
+
+    if (!submitRes.ok) throw new Error(`Server responded with ${submitRes.status}`);
+    const result = await submitRes.json();
+
+    // Handle result
+    const status = result.status?.description || 'Unknown';
+    const stdout = result.stdout || '';
+    const stderr = result.stderr || '';
+    const compile_output = result.compile_output || '';
+    const time = result.time ? `\n\n// ⏱ Time: ${result.time}s | Memory: ${Math.round((result.memory||0)/1024)}KB` : '';
+
+    if (status === 'Accepted') {
+      setOutput((stdout || '// Program ran with no output') + time, 'ok');
+      setBadge('success');
+    } else if (status.includes('Error') || status.includes('Wrong')) {
+      const errMsg = compile_output || stderr || stdout || status;
+      setOutput(`// ❌ ${status}\n\n${errMsg}`, 'err');
+      setBadge('error');
+      parseRuntimeErrors(errMsg);
+    } else if (status.includes('Time Limit')) {
+      setOutput('// ⏱ Time Limit Exceeded — your code took too long', 'err');
+      setBadge('error');
+    } else {
+      setOutput(`// Status: ${status}\n${stdout}${stderr}${compile_output}`, stdout ? 'ok' : 'err');
+      setBadge(stdout ? 'success' : 'error');
+    }
+  } catch (err) {
+    // Fallback: try Piston API
+    try {
+      const pistonMap = {
+        python:'python', javascript:'javascript', c:'c', cpp:'cpp',
+        java:'java', typescript:'typescript', go:'go', rust:'rust', php:'php', ruby:'ruby'
+      };
+      const pistonVer = {
+        python:'3.10.0', javascript:'18.15.0', c:'10.2.0', cpp:'10.2.0',
+        java:'15.0.2', typescript:'5.0.3', go:'1.16.2', rust:'1.50.0', php:'8.2.3', ruby:'3.0.1'
+      };
+      const pRes = await fetch('https://emkc.org/api/v2/piston/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          language: pistonMap[currentLang],
+          version: pistonVer[currentLang],
+          files: [{ name: meta.file, content: code }],
+          stdin: stdin || ''
+        })
+      });
+      const pData = await pRes.json();
+      const run = pData.run || {};
+      if (run.stderr && !run.stdout) {
+        setOutput(run.stderr, 'err'); setBadge('error'); parseRuntimeErrors(run.stderr);
+      } else {
+        setOutput((run.stdout || '// No output') + (run.stderr ? '\n---\n' + run.stderr : ''), 'ok');
+        setBadge('success');
+      }
+    } catch (e2) {
+      setOutput(
+        '// ⚠️ Could not connect to execution server.\n' +
+        '// Solutions:\n' +
+        '// 1. Open this file directly (not from file:// — use a local server)\n' +
+        '// 2. Upload to your website and run from there\n' +
+        '// 3. Use: npx serve . (in terminal) to test locally\n\n' +
+        '// Error: ' + err.message, 'err'
+      );
+      setBadge('error');
+    }
+  }
+  btn.disabled = false; btn.textContent = '▶ Run';
+}
+
+function parseRuntimeErrors(stderr) {
+  if (!monacoInst || !editor) return;
+  const markers = [];
+  stderr.split('\n').forEach(line => {
+    const m = line.match(/line (\d+)/i) || line.match(/:(\d+):/);
+    if (m) { const ln = parseInt(m[1]); markers.push({ startLineNumber: ln, endLineNumber: ln, startColumn: 1, endColumn: 999, message: line.trim(), severity: monacoInst.MarkerSeverity.Error }); }
+  });
+  if (markers.length) monacoInst.editor.setModelMarkers(editor.getModel(), 'runtime', markers);
+}
+
+// ─── AI Explain ───────────────────────────────────────────────────────────────
+async function aiExplain() {
+  const code = editor.getValue().trim();
+  if (!code) { setAI('<em>Write some code first!</em>'); return; }
+  const btn = document.getElementById('aiBtn');
+  btn.disabled = true; btn.textContent = '✦ Thinking...';
+  setAI('🤖 Analyzing your code...');
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6', max_tokens: 1000,
+        messages: [{ role: 'user', content: `You are an expert code assistant in CodeForge Pro IDE. Analyze this ${currentLang} code and respond in HTML format (compact, no outer tags):\n\n<b>📋 What it does:</b> 1-2 sentences<br><br>\n<b>⚠️ Issues found:</b> list bugs/errors or say None<br><br>\n<b>💡 Suggestions:</b> 2-3 improvements<br><br>\n<b>🔧 Quick fix:</b> if errors exist, show fixed snippet in &lt;code&gt; tags\n\nCode:\n\`\`\`${currentLang}\n${code}\n\`\`\`` }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'No response.';
+    setAI(text.replace(/```[\w]*/g, '<code>').replace(/```/g, '</code>').replace(/\n/g, '<br>'));
+  } catch (err) {
+    setAI(`<span style="color:var(--red2)">AI unavailable: ${err.message}</span>`);
+  }
+  btn.disabled = false; btn.textContent = '✦ AI Explain';
+}
+
+// ─── Fix Errors ───────────────────────────────────────────────────────────────
+function fixErrors() {
+  if (!editor) return;
+  let code = editor.getValue();
+  if (currentLang === 'python') {
+    code = code.replace(/^(\s*(?:if|elif|else|for|while|def|class|try|except|finally|with)\b[^:\n]+)$/gm, m => m.trimEnd().endsWith(':') ? m : m + ':');
+    code = code.replace(/^(\s*)print ([^(].*)$/gm, '$1print($2)');
+    code = code.split('\n').map(line => { const sp = line.match(/^( +)/); if (sp) { const n = sp[1].length; return ' '.repeat(Math.round(n / 4) * 4) + line.trimStart(); } return line; }).join('\n');
+  }
+  const br = { '{': '}', '(': ')', '[': ']' };
+  const opens = { '{': 0, '(': 0, '[': 0 };
+  let inStr = false, sc = '';
+  for (let i = 0; i < code.length; i++) {
+    const c = code[i]; if (inStr) { if (c === sc) inStr = false; continue; }
+    if (c === '"' || c === "'") { inStr = true; sc = c; continue; }
+    if (c in opens) opens[c]++; if (c === '}' || c === ']' || c === ')') { const k = Object.keys(br).find(x => br[x] === c); if (k && opens[k] > 0) opens[k]--; }
+  }
+  Object.entries(opens).forEach(([o, n]) => { for (let i = 0; i < n; i++) code += br[o]; });
+  editor.setValue(code);
+  setOutput('// ⚡ Auto-fix applied! Review changes then run.', 'info');
+  setBadge('fixed', 'fixed');
+  setTimeout(runLint, 100);
+}
+
+// ─── Share ────────────────────────────────────────────────────────────────────
+function shareCode() {
+  const payload = JSON.stringify({ code: editor.getValue(), lang: currentLang });
+  const encoded = btoa(unescape(encodeURIComponent(payload)));
+  const url = `${location.href.split('#')[0]}#share=${encoded}`;
+  document.getElementById('shareUrl').value = url;
+  document.getElementById('shareModal').classList.add('show');
+}
+function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
+function copyShare() {
+  const ta = document.getElementById('shareUrl'); ta.select();
+  try { document.execCommand('copy'); } catch (e) {}
+  const btn = event.target; btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = 'Copy Link', 2000);
+}
+function loadFromHash() {
+  const hash = location.hash;
+  if (!hash.startsWith('#share=')) return;
+  try {
+    const payload = JSON.parse(decodeURIComponent(escape(atob(hash.slice(7)))));
+    if (payload.lang && payload.code) {
+      currentLang = payload.lang;
+      document.getElementById('langSelect').value = payload.lang;
+      const meta = LANG_META[payload.lang];
+      monacoInst.editor.setModelLanguage(editor.getModel(), meta.monacoLang);
+      editor.setValue(payload.code);
+      document.getElementById('fileName').textContent = meta.file;
+      document.getElementById('langInfo').textContent = meta.info;
+      setOutput('// Shared code loaded! Press Run to execute.', 'info');
+    }
+  } catch (e) {}
+}
+</script>
+</body>
+</html>
