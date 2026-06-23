@@ -5,199 +5,161 @@ AI Career Copilot
 {% endblock %}
 
 {% block content %}
-<!-- Google Fonts: Plus Jakarta Sans -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
     :root {
-        --bg-main: #0b0f19;
-        --bg-surface: #111827;
-        --bg-card: #1e293b;
-        --accent-blue: #2563eb;
-        --accent-purple: #7c3aed;
-        --text-muted: #94a3b8;
+        --bg-main: #0a0e17;
+        --bg-surface: #0f1320;
+        --bg-card: #141a2c;
+        --line: #222a40;
+        --teal: #2dd4bf;
+        --teal-deep: #0d9488;
+        --amber: #f5b942;
+        --text-muted: #8b93ab;
+        --ink: #f3f5fb;
+        --shadow: rgba(0,0,0,0.4);
+    }
+
+    [data-theme="light"]{
+        --bg-main: #f6f5f1;
+        --bg-surface: #ffffff;
+        --bg-card: #ffffff;
+        --line: #e7e3d8;
+        --teal: #0d9488;
+        --teal-deep: #0b7a70;
+        --amber: #c9821a;
+        --text-muted: #6b7184;
+        --ink: #1d2233;
+        --shadow: rgba(40,40,60,0.08);
     }
 
     body {
         background-color: var(--bg-main);
-        color: #ffffff;
+        color: var(--ink);
         font-family: 'Plus Jakarta Sans', sans-serif;
         letter-spacing: -0.01em;
+        transition: background-color .25s ease, color .25s ease;
     }
 
-    html {
-        scroll-behavior: smooth;
-    }
+    html { scroll-behavior: smooth; }
 
-    /* Navbar styling modification */
     .navbar {
         background-color: var(--bg-surface) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid var(--line);
     }
-    
-    .navbar-brand {
-        letter-spacing: -0.03em;
-    }
+    .navbar-brand { letter-spacing: -0.03em; color: var(--ink) !important; }
 
-    /* Optimized & Shrunken Hero Section */
+    .theme-toggle-pill{
+        display:flex; align-items:center; gap:8px;
+        background: var(--bg-card);
+        border: 1px solid var(--line);
+        color: var(--ink);
+        border-radius: 999px;
+        padding: 7px 14px;
+        font-size: 0.85rem; font-weight: 600;
+        cursor: pointer;
+        margin-right: 12px;
+        transition: border-color .2s ease, color .2s ease;
+    }
+    .theme-toggle-pill:hover{ border-color: var(--teal); color: var(--teal); }
+    .theme-toggle-pill .icon-moon{ display:inline-block; }
+    .theme-toggle-pill .icon-sun{ display:none; }
+    [data-theme="light"] .theme-toggle-pill .icon-moon{ display:none; }
+    [data-theme="light"] .theme-toggle-pill .icon-sun{ display:inline-block; }
+
     .hero {
-        background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(124, 58, 237, 0.95));
-        border-radius: 20px;
-        padding: 50px 30px; /* Reduced padding to fix vertical size */
+        background: linear-gradient(135deg, rgba(13,148,136,0.95), rgba(10,74,71,0.95));
+        border-radius: 22px;
+        padding: 50px 30px;
         text-align: center;
         margin-top: 30px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 14px 34px -10px var(--shadow);
+        border: 1px solid rgba(45,212,191,0.25);
     }
 
-    .hero h1 {
-        font-size: 42px; /* Slightly scaled down for better proportions */
-        font-weight: 800;
-        letter-spacing: -0.03em;
-        margin-bottom: 12px;
-    }
+    .hero h1 { font-size: 42px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 12px; color:#fff; }
+    .hero p { font-size: 16px; color: rgba(255,255,255,0.88); max-width: 700px; margin: 0 auto; line-height: 1.5; }
 
-    .hero p {
-        font-size: 16px; /* Crisper text size */
-        color: rgba(255, 255, 255, 0.85);
-        max-width: 700px;
-        margin: 0 auto;
-        line-height: 1.5;
-    }
-
-    /* Unified Component Cards */
     .stat-card, .feature-card, .course-card {
         background-color: var(--bg-card);
-        border: 1px solid rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--line);
         border-radius: 16px;
         padding: 24px 20px;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         height: 100%;
     }
 
-    .stat-card {
-        text-align: center;
-    }
+    .stat-card { text-align: center; }
 
     .stat-card h1 {
-        font-size: 36px;
-        font-weight: 800;
-        background: linear-gradient(135deg, #60a5fa, #a78bfa);
+        font-size: 36px; font-weight: 800;
+        background: linear-gradient(135deg, var(--teal), var(--amber));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 6px;
-        letter-spacing: -0.03em;
+        margin-bottom: 6px; letter-spacing: -0.03em;
     }
 
     .stat-card p {
-        color: var(--text-muted);
-        margin-bottom: 0;
-        font-weight: 600;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+        color: var(--text-muted); margin-bottom: 0; font-weight: 700;
+        font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;
     }
 
-    .feature-card h4, .course-card h5 {
-        font-size: 18px;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-    }
+    .feature-card h4, .course-card h5 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
+    .feature-card h4 { margin-top: 12px; margin-bottom: 8px; }
+    .feature-card p { color: var(--text-muted); font-size: 14px; margin-bottom: 0; line-height: 1.6; }
+    .feature-card .icon { font-size: 32px; display: inline-block; line-height: 1; }
 
-    .feature-card h4 {
-        margin-top: 12px;
-        margin-bottom: 8px;
-    }
+    .course-card { text-align: left; display: flex; flex-direction: column; justify-content: space-between; }
+    .course-card small { color: var(--text-muted); font-size: 13px; font-weight: 500; }
 
-    .feature-card p {
-        color: var(--text-muted);
-        font-size: 14px;
-        margin-bottom: 0;
-        line-height: 1.6;
-    }
-
-    .feature-card .icon {
-        font-size: 32px;
-        display: inline-block;
-        line-height: 1;
-    }
-
-    .course-card {
-        text-align: left;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-
-    .course-card small {
-        color: var(--text-muted);
-        font-size: 13px;
-        font-weight: 500;
-    }
-
-    /* Hover States */
     .stat-card:hover, .feature-card:hover {
         transform: translateY(-4px);
-        border-color: rgba(255, 255, 255, 0.12);
-        background-color: #223047;
+        border-color: var(--teal);
     }
 
     .course-card:hover {
         transform: translateY(-5px);
-        border-color: var(--accent-blue);
-        box-shadow: 0 0 20px rgba(37, 99, 235, 0.25);
-        background-color: #223047;
+        border-color: var(--teal);
+        box-shadow: 0 0 20px rgba(45,212,191,0.2);
     }
 
-    /* Typography & Section Utilities */
     .section-title {
-        text-align: center;
-        margin-top: 70px;
-        margin-bottom: 35px;
-        font-size: 28px;
-        font-weight: 800;
-        letter-spacing: -0.02em;
+        text-align: center; margin-top: 70px; margin-bottom: 35px;
+        font-size: 28px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink);
     }
 
-    /* Callout CTA Panel */
     .mentor-box {
-        background: linear-gradient(135deg, #1d4ed8, #6d28d9);
-        border-radius: 20px;
+        background: linear-gradient(135deg, var(--teal-deep), #0a4a47);
+        border-radius: 22px;
         padding: 50px 30px;
         text-align: center;
         margin-top: 70px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 14px 34px -10px var(--shadow);
+        border: 1px solid rgba(45,212,191,0.25);
     }
 
-    .mentor-box h1 {
-        font-size: 36px;
-        font-weight: 800;
-        letter-spacing: -0.02em;
-    }
+    .mentor-box h1 { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; color:#fff; }
 
-    /* Footer */
     footer {
         background-color: var(--bg-surface);
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 40px 20px;
-        text-align: center;
-        margin-top: 90px;
+        border-top: 1px solid var(--line);
+        padding: 40px 20px; text-align: center; margin-top: 90px;
     }
+    footer h4 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--ink); }
+    footer p { color: var(--text-muted); font-size: 13px; margin-bottom: 4px; }
 
-    footer h4 {
-        font-size: 18px;
-        font-weight: 700;
-        margin-bottom: 8px;
+    .btn-cc-primary{
+        background: var(--teal); border: 1px solid var(--teal); color: #04231f; font-weight: 700;
     }
+    .btn-cc-primary:hover{ background: var(--teal-deep); border-color: var(--teal-deep); color:#fff; }
 
-    footer p {
-        color: var(--text-muted);
-        font-size: 13px;
-        margin-bottom: 4px;
+    .btn-cc-outline{
+        border: 1px solid var(--line); color: var(--ink); background: transparent; font-weight:600;
     }
+    .btn-cc-outline:hover{ border-color: var(--teal); color: var(--teal); }
 </style>
 
 <!-- Navbar -->
@@ -207,16 +169,21 @@ AI Career Copilot
             AI Career Copilot
         </a>
         <div class="d-flex align-items-center">
-            <a href="/learning/" class="btn btn-outline-light btn-sm me-2 px-3 fw-medium">
+            <button id="themeToggleBtn" class="theme-toggle-pill" type="button" aria-label="Toggle dark / light mode">
+                <i class="bi bi-moon-stars-fill icon-moon"></i>
+                <i class="bi bi-sun-fill icon-sun"></i>
+                <span>Theme</span>
+            </button>
+            <a href="/learning/" class="btn btn-cc-outline btn-sm me-2 px-3 fw-medium">
                 Learning Hub
             </a>
-            <a href="/learning/ai-mentor/" class="btn btn-outline-info btn-sm me-3 px-3 fw-medium">
+            <a href="/learning/ai-mentor/" class="btn btn-cc-outline btn-sm me-3 px-3 fw-medium">
                 AI Mentor
             </a>
-            <a href="/register/" class="btn btn-primary btn-sm me-2 px-3 fw-medium">
+            <a href="/register/" class="btn btn-cc-primary btn-sm me-2 px-3 fw-medium">
                 Register
             </a>
-            <a href="/login/" class="btn btn-success btn-sm px-3 fw-medium">
+            <a href="/login/" class="btn btn-cc-outline btn-sm px-3 fw-medium">
                 Login
             </a>
         </div>
@@ -311,7 +278,7 @@ AI Career Copilot
     <h2 class="section-title">Explore Career Tracks</h2>
     <div class="row g-3">
         <div class="col-md-3">
-            <a href="/learning/java-full-stack/" class="text-decoration-none text-white d-block h-100">
+            <a href="/learning/java-full-stack/" class="text-decoration-none d-block h-100">
                 <div class="course-card">
                     <h5>☕ Java Full Stack</h5>
                     <small>Spring Boot &bull; React &bull; MySQL</small>
@@ -319,7 +286,7 @@ AI Career Copilot
             </a>
         </div>
         <div class="col-md-3">
-            <a href="/learning/python-full-stack/" class="text-decoration-none text-white d-block h-100">
+            <a href="/learning/python-full-stack/" class="text-decoration-none d-block h-100">
                 <div class="course-card">
                     <h5>🐍 Python Full Stack</h5>
                     <small>Django &bull; React &bull; PostgreSQL</small>
@@ -327,7 +294,7 @@ AI Career Copilot
             </a>
         </div>
         <div class="col-md-3">
-            <a href="/learning/frontend-developer/" class="text-decoration-none text-white d-block h-100">
+            <a href="/learning/frontend-developer/" class="text-decoration-none d-block h-100">
                 <div class="course-card">
                     <h5>🎨 Frontend Developer</h5>
                     <small>HTML &bull; CSS &bull; JavaScript &bull; React</small>
@@ -335,7 +302,7 @@ AI Career Copilot
             </a>
         </div>
         <div class="col-md-3">
-            <a href="/learning/backend-developer-java/" class="text-decoration-none text-white d-block h-100">
+            <a href="/learning/backend-developer-java/" class="text-decoration-none d-block h-100">
                 <div class="course-card">
                     <h5>⚙️ Backend (Java)</h5>
                     <small>Java &bull; Spring Boot &bull; REST APIs</small>
@@ -343,7 +310,7 @@ AI Career Copilot
             </a>
         </div>
         <div class="col-md-3">
-            <a href="/learning/backend-developer-python/" class="text-decoration-none text-white d-block h-100">
+            <a href="/learning/backend-developer-python/" class="text-decoration-none d-block h-100">
                 <div class="course-card">
                     <h5>⚙️ Backend (Python)</h5>
                     <small>Python &bull; Django &bull; REST Framework</small>
@@ -351,7 +318,7 @@ AI Career Copilot
             </a>
         </div>
         <div class="col-md-3">
-            <a href="/learning/ai-ml/" class="text-decoration-none text-white d-block h-100">
+            <a href="/learning/ai-ml/" class="text-decoration-none d-block h-100">
                 <div class="course-card">
                     <h5>🤖 AI & ML</h5>
                     <small>Python &bull; Core ML &bull; GenAI</small>
@@ -359,7 +326,7 @@ AI Career Copilot
             </a>
         </div>
         <div class="col-md-3">
-            <a href="/learning/data-analytics/" class="text-decoration-none text-white d-block h-100">
+            <a href="/learning/data-analytics/" class="text-decoration-none d-block h-100">
                 <div class="course-card">
                     <h5>📊 Data Analytics</h5>
                     <small>Excel &bull; SQL &bull; Power BI</small>
@@ -367,7 +334,7 @@ AI Career Copilot
             </a>
         </div>
         <div class="col-md-3">
-            <a href="/learning/data-science/" class="text-decoration-none text-white d-block h-100">
+            <a href="/learning/data-science/" class="text-decoration-none d-block h-100">
                 <div class="course-card">
                     <h5>📈 Data Science</h5>
                     <small>Python &bull; Statistics &bull; Predictive ML</small>
@@ -412,7 +379,7 @@ AI Career Copilot
 <div class="container">
     <div class="mentor-box">
         <h1>🤖 Deep Interactive Mentorship</h1>
-        <p class="lead mt-3 mx-auto" style="max-width: 700px; font-size: 16px;">
+        <p class="lead mt-3 mx-auto" style="max-width: 700px; font-size: 16px; color: rgba(255,255,255,0.88);">
             Debug sophisticated logical data algorithms, examine framework implementations, or execute mock behavioral technical deep dives contextually.
         </p>
         <a href="/learning/ai-mentor/" class="btn btn-light mt-3 px-4 fw-600">
@@ -429,4 +396,22 @@ AI Career Copilot
         <p class="mt-3 opacity-50">&copy; 2026 AI Career Copilot | All Rights Reserved.</p>
     </div>
 </footer>
+
+<script>
+(function () {
+    var root = document.documentElement;
+    var saved = localStorage.getItem('cc-theme') || 'dark';
+    root.setAttribute('data-theme', saved);
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.getElementById('themeToggleBtn');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+            var current = root.getAttribute('data-theme');
+            var next = current === 'dark' ? 'light' : 'dark';
+            root.setAttribute('data-theme', next);
+            localStorage.setItem('cc-theme', next);
+        });
+    });
+})();
+</script>
 {% endblock %}

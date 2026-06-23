@@ -1,156 +1,350 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cute Lamp Login</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-{% block title %}
-Login
-{% endblock %}
+    body {
+      background: #0e1117;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+    }
 
-{% block content %}
+    .scene {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 60px;
+      padding: 40px;
+    }
 
-<div class="container">
+    /* ── LAMP ── */
+    .lamp-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
 
-    <div class="row justify-content-center align-items-center"
-         style="min-height:80vh;">
+    #lampSvg {
+      width: 200px;
+      height: 290px;
+      overflow: visible;
+      transition: filter 0.5s;
+    }
 
-        <div class="col-md-5">
+    .cord-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: grab;
+      touch-action: none;
+    }
+    .cord-wrap:active { cursor: grabbing; }
 
-            <div class="card login-card">
+    #cordSvg {
+      width: 36px;
+      overflow: visible;
+      display: block;
+    }
 
-                <div class="card-body p-5">
+    /* ── LOGIN CARD ── */
+    .login-card {
+      background: #141824;
+      border: 2px solid transparent;
+      border-radius: 18px;
+      padding: 40px 36px;
+      width: 300px;
+      transition: border-color 0.6s, box-shadow 0.6s, opacity 0.6s;
+      opacity: 0.08;
+      pointer-events: none;
+    }
 
-                    <div class="text-center mb-4">
+    .login-card.lit {
+      opacity: 1;
+      pointer-events: all;
+    }
 
-                        <h1>
-                            🔐 Login
-                        </h1>
+    .login-card h2 {
+      color: #fff;
+      font-size: 1.55rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 28px;
+    }
 
-                        <p class="text-muted">
+    .form-group { margin-bottom: 16px; }
 
-                            Welcome back to AI Career Copilot
+    .form-group label {
+      display: block;
+      color: #ccc;
+      font-size: 0.82rem;
+      margin-bottom: 6px;
+    }
 
-                        </p>
+    .form-group input {
+      width: 100%;
+      background: #0e1117;
+      border: 1px solid #2a2f42;
+      border-radius: 8px;
+      padding: 11px 13px;
+      color: #e0e0e0;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .form-group input:focus { border-color: #5a8a5a; }
+    .form-group input::placeholder { color: #444; }
 
-                    </div>
+    #loginBtn {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 10px;
+      background: #4a7a4a;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 6px;
+      letter-spacing: .4px;
+      transition: background 0.2s, transform 0.1s;
+    }
+    #loginBtn:hover { background: #5a9a5a; }
+    #loginBtn:active { transform: translateY(1px); }
 
-                    <form method="POST">
+    .form-footer { margin-top: 18px; text-align: center; }
+    .forgot-link {
+      color: #777;
+      font-size: 0.83rem;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .forgot-link:hover { color: #bbb; }
+  </style>
+</head>
+<body>
 
-                        {% csrf_token %}
+<div class="scene">
 
-                        <div class="mb-3">
+  <!-- LEFT: LAMP -->
+  <div class="lamp-side">
+    <svg id="lampSvg" viewBox="0 0 200 290" xmlns="http://www.w3.org/2000/svg">
+      <!-- light cone -->
+      <ellipse id="lightCone" cx="100" cy="195" rx="58" ry="22"
+        fill="rgba(255,255,200,0)" style="transition:fill .5s"/>
 
-                            <label class="form-label">
+      <!-- shade -->
+      <path id="shade"
+        d="M58,55 L32,185 Q32,197 44,197 L156,197 Q168,197 168,185 L142,55 Q139,43 128,41 L72,41 Q61,43 58,55 Z"
+        fill="#2e2e2e" style="transition:fill .5s"/>
 
-                                Username
+      <!-- shade rim -->
+      <ellipse id="rim" cx="100" cy="196" rx="60" ry="13"
+        fill="#252525" style="transition:fill .5s"/>
 
-                            </label>
+      <!-- sleeping eyes (default OFF) -->
+      <g id="eyeSleep">
+        <path d="M78,118 Q84,111 90,118" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M110,118 Q116,111 122,118" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </g>
 
-                            <input
-                                type="text"
-                                name="username"
-                                class="form-control"
-                                placeholder="Enter username"
-                                required>
+      <!-- happy face (shown when ON) -->
+      <g id="eyeHappy" opacity="0" style="transition:opacity .4s">
+        <path d="M76,114 Q84,106 92,114" stroke="#111" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <path d="M108,114 Q116,106 124,114" stroke="#111" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+        <path d="M85,137 Q100,153 115,137" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="100" cy="146" rx="7" ry="5.5" fill="#d94040"/>
+      </g>
 
-                        </div>
+      <!-- pole -->
+      <rect id="pole" x="94" y="197" width="12" height="56" rx="5"
+        fill="#999" style="transition:fill .5s"/>
+      <!-- base block -->
+      <rect id="baseBlock" x="72" y="248" width="56" height="14" rx="6"
+        fill="#aaa" style="transition:fill .5s"/>
+      <!-- base foot -->
+      <ellipse id="baseFoot" cx="100" cy="262" rx="38" ry="10"
+        fill="#888" style="transition:fill .5s"/>
+    </svg>
 
-                        <div class="mb-4">
-
-                            <label class="form-label">
-
-                                Password
-
-                            </label>
-
-                            <input
-                                type="password"
-                                name="password"
-                                class="form-control"
-                                placeholder="Enter password"
-                                required>
-
-                        </div>
-
-                        <div class="d-grid">
-
-                            <button
-                                type="submit"
-                                class="btn btn-primary btn-lg">
-
-                                Login
-
-                            </button>
-
-                        </div>
-
-                    </form>
-
-                    <hr>
-
-                    <div class="text-center">
-
-                        <p>
-
-                            Don't have an account?
-
-                        </p>
-
-                        <a href="/register/"
-                           class="btn btn-outline-light">
-
-                            Create Account
-
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
+    <!-- DRAGGABLE CORD -->
+    <div class="cord-wrap" id="cordWrap">
+      <svg id="cordSvg" viewBox="0 0 36 80" height="80">
+        <path id="cordPath"
+          d="M18,0 C24,14 12,26 18,40 C24,54 12,66 18,74"
+          stroke="#888" stroke-width="2.5" fill="none" stroke-linecap="round"
+          style="transition:stroke .5s"/>
+        <circle id="cordKnob" cx="18" cy="76" r="5"
+          fill="#888" style="transition:fill .5s"/>
+      </svg>
     </div>
+  </div>
+
+  <!-- RIGHT: LOGIN FORM -->
+  <div class="login-card" id="loginCard">
+    <h2>Welcome Back</h2>
+
+    <form method="POST">
+    {% csrf_token %}
+
+    <div class="form-group">
+        <label>Username</label>
+        <input
+            type="text"
+            name="username"
+            placeholder="Enter your username"
+            required
+        >
+    </div>
+
+    <div class="form-group">
+        <label>Password</label>
+        <input
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            required
+        >
+    </div>
+
+    <button id="loginBtn" type="submit">
+        Login
+    </button>
+</form>
+
+    <div class="form-footer">
+      <a href="#" class="forgot-link">Forgot Password?</a>
+    </div>
+  </div>
 
 </div>
 
-<style>
+<script>
+  let lampOn     = false;
+  let colorIndex = 0;
 
-.login-card{
+  const palettes = [
+    { shade:'#5a8a5a', rim:'#4a7a4a', pole:'#e0e0e0', base:'#d0d0d0',
+      foot:'#bbb', cord:'#ccc', glow:'rgba(90,138,90,.35)',
+      border:'#5a8a5a', cone:'rgba(220,255,180,.18)', svgGlow:'90,138,90' },
+    { shade:'#9a6a40', rim:'#7a5030', pole:'#e0e0e0', base:'#d0d0d0',
+      foot:'#bbb', cord:'#ccc', glow:'rgba(154,106,64,.35)',
+      border:'#9a6a40', cone:'rgba(255,220,160,.18)', svgGlow:'154,106,64' },
+  ];
 
-    background:#1e293b;
+  const shade     = document.getElementById('shade');
+  const rim       = document.getElementById('rim');
+  const pole      = document.getElementById('pole');
+  const baseBlock = document.getElementById('baseBlock');
+  const baseFoot  = document.getElementById('baseFoot');
+  const lightCone = document.getElementById('lightCone');
+  const eyeSleep  = document.getElementById('eyeSleep');
+  const eyeHappy  = document.getElementById('eyeHappy');
+  const cordPath  = document.getElementById('cordPath');
+  const cordKnob  = document.getElementById('cordKnob');
+  const lampSvg   = document.getElementById('lampSvg');
+  const loginCard = document.getElementById('loginCard');
 
-    border:1px solid rgba(
-        255,
-        255,
-        255,
-        0.08
+  function applyLampState() {
+    if (lampOn) {
+      const p = palettes[colorIndex];
+      shade.style.fill      = p.shade;
+      rim.style.fill        = p.rim;
+      pole.style.fill       = p.pole;
+      baseBlock.style.fill  = p.base;
+      baseFoot.style.fill   = p.foot;
+      cordPath.setAttribute('stroke', p.cord);
+      cordKnob.style.fill   = p.cord;
+      lightCone.style.fill  = p.cone;
+      eyeSleep.style.opacity = '0';
+      eyeHappy.style.opacity = '1';
+      lampSvg.style.filter  = `drop-shadow(0 0 28px rgb(${p.svgGlow}))`;
+      loginCard.style.borderColor = p.border;
+      loginCard.style.boxShadow   = `0 0 28px ${p.glow}, 0 0 60px ${p.glow}`;
+      loginCard.classList.add('lit');
+    } else {
+      shade.style.fill      = '#2e2e2e';
+      rim.style.fill        = '#252525';
+      pole.style.fill       = '#999';
+      baseBlock.style.fill  = '#aaa';
+      baseFoot.style.fill   = '#888';
+      cordPath.setAttribute('stroke', '#888');
+      cordKnob.style.fill   = '#888';
+      lightCone.style.fill  = 'rgba(255,255,200,0)';
+      eyeSleep.style.opacity = '1';
+      eyeHappy.style.opacity = '0';
+      lampSvg.style.filter  = 'none';
+      loginCard.style.borderColor = 'transparent';
+      loginCard.style.boxShadow   = 'none';
+      loginCard.classList.remove('lit');
+    }
+  }
+
+  /* Drag cord to toggle */
+  const cordWrap = document.getElementById('cordWrap');
+  let dragging = false;
+  let startY   = 0;
+  let pulled   = false;
+
+  function onDragStart(e) {
+    dragging = true;
+    pulled   = false;
+    startY   = e.touches ? e.touches[0].clientY : e.clientY;
+    e.preventDefault();
+  }
+
+  function onDragMove(e) {
+    if (!dragging) return;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const dy      = clientY - startY;
+    const stretch = Math.max(0, Math.min(dy, 60));
+    const endY    = 74 + stretch;
+
+    cordPath.setAttribute('d',
+      `M18,0 C24,14 12,26 18,${20 + stretch * 0.4} C24,${40 + stretch * 0.4} 12,${60 + stretch * 0.3} 18,${endY}`
     );
+    document.getElementById('cordSvg').setAttribute('height', 80 + stretch);
+    cordKnob.setAttribute('cy', endY + 2);
 
-    border-radius:25px;
+    if (dy > 30 && !pulled) {
+      pulled = true;
+      if (lampOn) {
+        colorIndex = (colorIndex + 1) % palettes.length;
+        if (colorIndex === 0) lampOn = false;
+      } else {
+        lampOn     = true;
+        colorIndex = 0;
+      }
+      applyLampState();
+    }
+  }
 
-    box-shadow:
-    0 0 25px rgba(
-        37,
-        99,
-        235,
-        0.25
-    );
+  function onDragEnd() {
+    if (!dragging) return;
+    dragging = false;
+    cordPath.setAttribute('d', 'M18,0 C24,14 12,26 18,40 C24,54 12,66 18,74');
+    document.getElementById('cordSvg').setAttribute('height', '80');
+    cordKnob.setAttribute('cy', '76');
+  }
 
-}
+  cordWrap.addEventListener('mousedown',  onDragStart);
+  window.addEventListener('mousemove',    onDragMove);
+  window.addEventListener('mouseup',      onDragEnd);
+  cordWrap.addEventListener('touchstart', onDragStart, { passive: false });
+  window.addEventListener('touchmove',    onDragMove,  { passive: false });
+  window.addEventListener('touchend',     onDragEnd);
 
-.login-card:hover{
+ 
 
-    box-shadow:
-    0 0 35px rgba(
-        37,
-        99,
-        235,
-        0.4
-    );
-
-    transition:0.3s;
-
-}
-
-</style>
-
-{% endblock %}
+  applyLampState();
+</script>
+</body>
+</html>
