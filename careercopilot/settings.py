@@ -20,10 +20,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ln*%u9)$x#788kc6&^5wjaa2b(&fen640ue25smo)2mp!a9a7o'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
+
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-ln*%u9)$x#788kc6&^5wjaa2b(&fen640ue25smo)2mp!a9a70')
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
@@ -36,6 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
+    'django.contrib.staticfiles',
+    'cloudinary',
     'django.contrib.staticfiles',
     'accounts',
     'resume',
@@ -139,3 +147,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 #ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
+
+import cloudinary
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('dprcae4es'),       # your cloud name
+    'API_KEY': os.environ.get('868363885945821'),       # paste your API key
+    'API_SECRET': os.environ.get('VH2YrXGRk6umXLBXJsL3ZzSU3_o'), # paste your API secret
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
