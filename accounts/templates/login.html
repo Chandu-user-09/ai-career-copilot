@@ -1,140 +1,158 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cute Lamp Login</title>
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+{% extends 'base.html' %}
+{% block title %}Login - AI Career Copilot{% endblock %}
+{% block content %}
 
-    body {
-      background: #0e1117;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      overflow: hidden;
-    }
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    .scene {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 60px;
-      padding: 40px;
-    }
+  body {
+    background: #0e1117;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+  }
 
-    /* ── LAMP ── */
-    .lamp-side {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      user-select: none;
-    }
+  .scene {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    padding: 40px;
+    flex-wrap: wrap;
+  }
 
-    #lampSvg {
-      width: 200px;
-      height: 290px;
-      overflow: visible;
-      transition: filter 0.5s;
-    }
+  /* ── LAMP ── */
+  .lamp-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+  }
 
-    .cord-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: grab;
-      touch-action: none;
-    }
-    .cord-wrap:active { cursor: grabbing; }
+  #lampSvg {
+    width: 200px;
+    height: 290px;
+    overflow: visible;
+    transition: filter 0.5s;
+  }
 
-    #cordSvg {
-      width: 36px;
-      overflow: visible;
-      display: block;
-    }
+  .cord-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: grab;
+    touch-action: none;
+  }
+  .cord-wrap:active { cursor: grabbing; }
 
-    /* ── LOGIN CARD ── */
-    .login-card {
-      background: #141824;
-      border: 2px solid transparent;
-      border-radius: 18px;
-      padding: 40px 36px;
-      width: 300px;
-      transition: border-color 0.6s, box-shadow 0.6s, opacity 0.6s;
-      opacity: 0.08;
-      pointer-events: none;
-    }
+  #cordSvg {
+    width: 36px;
+    overflow: visible;
+    display: block;
+  }
 
-    .login-card.lit {
-      opacity: 1;
-      pointer-events: all;
-    }
+  /* ── LOGIN CARD ── */
+  /* Card is always fully visible — lamp is decoration only */
+  .login-card {
+    background: #141824;
+    border: 2px solid #2a3a5a;
+    border-radius: 18px;
+    padding: 40px 36px;
+    width: 300px;
+    transition: border-color 0.6s, box-shadow 0.6s;
+    opacity: 1;
+    pointer-events: all;
+  }
 
-    .login-card h2 {
-      color: #fff;
-      font-size: 1.55rem;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 28px;
-    }
+  .login-card.lit {
+    border-color: #5a8a5a;
+    box-shadow: 0 0 28px rgba(90,138,90,.35), 0 0 60px rgba(90,138,90,.35);
+  }
 
-    .form-group { margin-bottom: 16px; }
+  .login-card h2 {
+    color: #fff;
+    font-size: 1.55rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 28px;
+  }
 
-    .form-group label {
-      display: block;
-      color: #ccc;
-      font-size: 0.82rem;
-      margin-bottom: 6px;
-    }
+  .form-group { margin-bottom: 16px; }
 
-    .form-group input {
-      width: 100%;
-      background: #0e1117;
-      border: 1px solid #2a2f42;
-      border-radius: 8px;
-      padding: 11px 13px;
-      color: #e0e0e0;
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-    .form-group input:focus { border-color: #5a8a5a; }
-    .form-group input::placeholder { color: #444; }
+  .form-group label {
+    display: block;
+    color: #ccc;
+    font-size: 0.82rem;
+    margin-bottom: 6px;
+  }
 
-    #loginBtn {
-      width: 100%;
-      padding: 13px;
-      border: none;
-      border-radius: 10px;
-      background: #4a7a4a;
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 6px;
-      letter-spacing: .4px;
-      transition: background 0.2s, transform 0.1s;
-    }
-    #loginBtn:hover { background: #5a9a5a; }
-    #loginBtn:active { transform: translateY(1px); }
+  .form-group input {
+    width: 100%;
+    background: #0e1117;
+    border: 1px solid #2a2f42;
+    border-radius: 8px;
+    padding: 11px 13px;
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  .form-group input:focus { border-color: #5a8a5a; }
+  .form-group input::placeholder { color: #444; }
 
-    .form-footer { margin-top: 18px; text-align: center; }
-    .forgot-link {
-      color: #777;
-      font-size: 0.83rem;
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-    .forgot-link:hover { color: #bbb; }
-  </style>
-</head>
-<body>
+  #loginBtn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    background: #4a7a4a;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+    letter-spacing: .4px;
+    transition: background 0.2s, transform 0.1s;
+  }
+  #loginBtn:hover { background: #5a9a5a; }
+  #loginBtn:active { transform: translateY(1px); }
+
+  .form-footer { margin-top: 18px; text-align: center; }
+  .forgot-link {
+    color: #777;
+    font-size: 0.83rem;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .forgot-link:hover { color: #bbb; }
+
+  .success-message {
+    background: #28a745;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .message-error {
+    background: #dc3545;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+  }
+</style>
 
 <div class="scene">
 
-  <!-- LEFT: LAMP -->
+  <!-- LEFT: LAMP (decoration only — does not gate the form) -->
   <div class="lamp-side">
     <svg id="lampSvg" viewBox="0 0 200 290" xmlns="http://www.w3.org/2000/svg">
       <!-- light cone -->
@@ -190,41 +208,48 @@
 
   <!-- RIGHT: LOGIN FORM -->
   <div class="login-card" id="loginCard">
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="{% if message.tags == 'error' %}message-error{% else %}success-message{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
     <h2>Welcome Back</h2>
 
     <form method="POST">
-    {% csrf_token %}
+      {% csrf_token %}
 
-    <div class="form-group">
+      <div class="form-group">
         <label>Username</label>
         <input
-            type="text"
-            name="username"
-            placeholder="Enter your username"
-            required
+          type="text"
+          name="username"
+          placeholder="Enter your username"
+          required
         >
-    </div>
+      </div>
 
-    <div class="form-group">
+      <div class="form-group">
         <label>Password</label>
         <input
-            type="password"
-            name="password"
-            placeholder="Enter your password"
-            required
+          type="password"
+          name="password"
+          placeholder="Enter your password"
+          required
         >
+      </div>
+
+      <button id="loginBtn" type="submit">Login</button>
+    </form>
+
+    <div style="margin-top:10px;">
+      <a href="/register/" class="forgot-link">Create New Account</a>
     </div>
 
-    <button id="loginBtn" type="submit">
-        Login
-    </button>
-</form>
-
-    <div class="form-footer">
-      <a href="#" class="forgot-link">Forgot Password?</a>
-    </div>
   </div>
-
 </div>
 
 <script>
@@ -282,7 +307,8 @@
       eyeSleep.style.opacity = '1';
       eyeHappy.style.opacity = '0';
       lampSvg.style.filter  = 'none';
-      loginCard.style.borderColor = 'transparent';
+      // Card stays fully visible — only remove the glow effect
+      loginCard.style.borderColor = '#2a3a5a';
       loginCard.style.boxShadow   = 'none';
       loginCard.classList.remove('lit');
     }
@@ -342,9 +368,7 @@
   window.addEventListener('touchmove',    onDragMove,  { passive: false });
   window.addEventListener('touchend',     onDragEnd);
 
- 
-
   applyLampState();
 </script>
-</body>
-</html>
+
+{% endblock %}

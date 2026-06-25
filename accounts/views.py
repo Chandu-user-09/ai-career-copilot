@@ -1,25 +1,17 @@
 import json
+import os
 
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
 import google.generativeai as genai
+from dotenv import load_dotenv
 
 from .forms import RegisterForm
 from learning.models import CourseResource
-
-
-# Configure Gemini with your API key (same key you use in ai_mentor)
-# Best practice: load from an environment variable instead of hardcoding.
-# import os
-# genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-
-
-import os
-from dotenv import load_dotenv
-import google.generativeai as genai
 
 load_dotenv()
 
@@ -29,62 +21,40 @@ genai.configure(
 
 
 def register(request):
-
     if request.method == "POST":
-
         form = RegisterForm(request.POST)
-
         if form.is_valid():
-
             form.save()
-
-            return redirect('/')
-
+            messages.success(request, "User registered successfully!")
+            return redirect('/login/')
     else:
-
         form = RegisterForm()
 
-    return render(
-        request,
-        "register.html",
-        {"form": form}
-    )
+    return render(request, "register.html", {"form": form})
 
 
 def user_login(request):
-
     if request.method == "POST":
-
         username = request.POST.get("username")
         password = request.POST.get("password")
 
-        user = authenticate(
-            request,
-            username=username,
-            password=password
-        )
+        user = authenticate(request, username=username, password=password)
 
         if user is not None:
-
             login(request, user)
-
             return redirect('/dashboard')
+        else:
+            messages.error(request, "Invalid username or password.")
 
-    return render(
-        request,
-        "login.html"
-    )
+    return render(request, "login.html")
 
 
 def user_logout(request):
-
     logout(request)
-
     return redirect('/')
 
 
 def dashboard(request):
-
     total_resources = CourseResource.objects.count()
 
     context = {
@@ -92,15 +62,10 @@ def dashboard(request):
         "total_courses": 8
     }
 
-    return render(
-        request,
-        "dashboard.html",
-        context
-    )
+    return render(request, "dashboard.html", context)
 
 
 def home(request):
-
     total_resources = CourseResource.objects.count()
 
     context = {
@@ -108,18 +73,11 @@ def home(request):
         "total_courses": 8
     }
 
-    return render(
-        request,
-        "home.html",
-        context
-    )
+    return render(request, "home.html", context)
 
 
 def compiler(request):
-    return render(
-        request,
-        "compiler.html"
-    )
+    return render(request, "compiler.html")
 
 
 @csrf_exempt
@@ -152,4 +110,7 @@ Code:
         return JsonResponse({"answer": answer})
 
     except Exception as e:
-        return JsonResponse({"answer": "AI Assistant is temporarily unavailable.\n\n" + str(e)}, status=500)
+        return JsonResponse(
+            {"answer": "AI Assistant is temporarily unavailable.\n\n" + str(e)},
+            status=500
+        )

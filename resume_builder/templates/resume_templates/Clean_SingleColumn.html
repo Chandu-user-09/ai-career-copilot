@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Resume - {{ name }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Inter', sans-serif;
+    background:#eef0f5;
+    color:#1d2233;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .resume-page {
+    max-width: 850px;
+    margin: 24px auto;
+    background:#ffffff;
+    display:grid;
+    grid-template-columns: 270px 1fr;
+    min-height: 1100px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    border-radius: 14px;
+    overflow:hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: linear-gradient(165deg, #0d3b36 0%, #0a2622 100%);
+    color:#ffffff;
+    padding: 38px 28px;
+  }
+  .avatar-ring {
+    width: 96px; height:96px; border-radius:50%;
+    background: linear-gradient(135deg,#2dd4bf,#0d9488);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 2rem; font-weight:800; color:#04231f;
+    margin: 0 auto 18px auto;
+    border: 3px solid rgba(255,255,255,0.15);
+  }
+  .sidebar h1 {
+    font-size: 1.3rem; font-weight:800; text-align:center; letter-spacing:-0.01em; line-height:1.25;
+  }
+  .sidebar .role {
+    text-align:center; font-size:0.8rem; color:#5eead4; font-weight:600;
+    margin-top:4px; text-transform:uppercase; letter-spacing:0.04em;
+  }
+  .side-section { margin-top:30px; }
+  .side-section h3 {
+    font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em;
+    color:#5eead4; font-weight:700; margin-bottom:12px;
+    border-bottom:1px solid rgba(255,255,255,0.15); padding-bottom:6px;
+  }
+  .contact-item {
+    display:flex; gap:8px; align-items:flex-start;
+    font-size:0.82rem; color:#d1f5ef; margin-bottom:9px; line-height:1.4; word-break: break-word;
+  }
+  .skill-pill-list { display:flex; flex-wrap:wrap; gap:6px; }
+  .skill-pill {
+    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18);
+    color:#e6fffb; font-size:0.72rem; font-weight:600;
+    padding:4px 10px; border-radius:999px;
+  }
+  .lang-row { display:flex; justify-content:space-between; font-size:0.8rem; color:#d1f5ef; margin-bottom:8px; }
+  .lang-row span:last-child { color:#5eead4; font-weight:700; font-size:0.7rem; text-transform:uppercase; }
+
+  /* Main content */
+  .main { padding: 40px 38px; }
+  .summary {
+    font-size:0.9rem; color:#4a5163; line-height:1.65; margin-bottom:30px;
+    border-left:3px solid #0d9488; padding-left:16px;
+  }
+  .main h3.section-head {
+    font-size:0.85rem; text-transform:uppercase; letter-spacing:0.08em;
+    color:#0d9488; font-weight:800; margin-bottom:16px; margin-top:30px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .main h3.section-head:first-of-type { margin-top:0; }
+  .main h3.section-head::after { content:""; flex:1; height:1px; background:#e2e8f0; }
+
+  .item-desc { font-size:0.85rem; color:#4a5163; line-height:1.7; }
+
+  .proj-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .proj-card { background:#f7faf9; border:1px solid #e2e8f0; border-radius:10px; padding:14px; }
+  .proj-card h4 { font-size:0.88rem; font-weight:700; margin-bottom:5px; color:#1d2233; }
+  .proj-card p { font-size:0.78rem; color:#5a6175; line-height:1.5; }
+  .proj-tags { margin-top:8px; display:flex; flex-wrap:wrap; gap:5px; }
+  .proj-tags span {
+    font-size:0.68rem; font-weight:700; color:#0d9488; background:rgba(13,148,136,0.1);
+    padding:2px 8px; border-radius:6px;
+  }
+
+  /* Download button */
+  .download-btn {
+    padding: 10px 20px;
+    background: #0d9488;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+  .download-btn:hover { background: #0f766e; }
+
+  @media print {
+    body { background:#fff; }
+    .resume-page { box-shadow:none; margin:0; border-radius:0; }
+    button { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="resume-page">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <!-- Improvement 2: initials computed in view, shows CP instead of CH -->
+    <div class="avatar-ring">{{ initials }}</div>
+    <h1>{{ name }}</h1>
+    <div class="role">{{ resume_title }}</div>
+
+    <div class="side-section">
+      <h3>Contact</h3>
+      <div class="contact-item">📍 {{ location }}</div>
+      <div class="contact-item">📧 {{ email }}</div>
+      <div class="contact-item">📱 {{ phone }}</div>
+      <div class="contact-item">🔗 {{ linkedin }}</div>
+      <div class="contact-item">💻 {{ github }}</div>
+    </div>
+
+    {% if show_skills %}
+    <div class="side-section">
+      <h3>Core Skills</h3>
+      <div class="skill-pill-list">
+        <!-- Bug fix: skills is now a list from the view, .split() removed -->
+        {% for skill in skills %}
+        <span class="skill-pill">{{ skill }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if show_education %}
+    <div class="side-section">
+      <h3>Education</h3>
+      <div style="font-size:0.85rem; color:#d1f5ef;">
+        {{ education|linebreaksbr }}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if show_languages %}
+    <div class="side-section">
+      <h3>Languages</h3>
+      <div style="font-size:0.8rem; color:#d1f5ef;">
+        {{ languages|linebreaksbr }}
+      </div>
+    </div>
+    {% endif %}
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- Improvement 1: Download button moved to top-right -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h2 style="color:#0d9488; font-size:1rem; font-weight:700; letter-spacing:0.04em;">Resume Preview</h2>
+      <button onclick="window.print()" class="download-btn">Download PDF</button>
+    </div>
+
+    {% if show_summary %}
+    <p class="summary">{{ summary }}</p>
+    {% endif %}
+
+    {% if show_experience %}
+    <h3 class="section-head">Experience</h3>
+    <div class="item-desc">{{ experience|linebreaksbr }}</div>
+    {% endif %}
+
+    <!-- Improvement 3: only show Projects section if projects list is also non-empty -->
+    {% if show_projects and projects %}
+    <h3 class="section-head">Projects</h3>
+    <div class="proj-grid">
+      {% for project in projects %}
+      <div class="proj-card">
+        <h4>{{ project.name }}</h4>
+        <p>{{ project.description }}</p>
+        <div class="proj-tags">
+          <span>{{ project.stack }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if show_certifications %}
+    <h3 class="section-head">Certifications</h3>
+    <div class="item-desc">{{ certifications|linebreaksbr }}</div>
+    {% endif %}
+
+    {% if show_achievements %}
+    <h3 class="section-head">Achievements</h3>
+    <div class="item-desc">{{ achievements|linebreaksbr }}</div>
+    {% endif %}
+
+  </main>
+
+</div>
+
+</body>
+</html>

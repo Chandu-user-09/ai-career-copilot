@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Resume - {{ name }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Outfit', sans-serif; background:#f3f4f6; color:#18181b; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .page { max-width:860px; margin:28px auto; background:#ffffff; box-shadow:0 6px 36px rgba(0,0,0,0.1); display:flex; min-height:1120px; }
+  .accent-bar { width:7px; background:linear-gradient(180deg,#7c3aed 0%,#4f46e5 60%,#2563eb 100%); flex-shrink:0; }
+  .sidebar { width:230px; flex-shrink:0; background:#1c1b29; padding:40px 24px; color:#e2e2f0; }
+  .avatar { width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg,#7c3aed,#2563eb); display:flex; align-items:center; justify-content:center; font-size:1.6rem; font-weight:800; color:#ffffff; margin:0 auto 16px; border:2px solid rgba(255,255,255,0.12); }
+  .sidebar h1 { font-size:1.2rem; font-weight:800; text-align:center; color:#ffffff; line-height:1.2; }
+  .sidebar .role-label { text-align:center; font-size:0.72rem; color:#a78bfa; text-transform:uppercase; letter-spacing:0.08em; margin-top:4px; font-weight:600; }
+  .side-divider { height:1px; background:rgba(255,255,255,0.08); margin:22px 0; }
+  .side-sec-head { font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.16em; color:#a78bfa; margin-bottom:12px; }
+  .contact-item { font-size:0.78rem; color:#c4c4d8; margin-bottom:8px; line-height:1.4; word-break:break-all; }
+  .contact-item strong { color:#e2e2f0; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:1px; }
+  .skill-bar-item { margin-bottom:9px; }
+  .skill-bar-label { font-size:0.78rem; color:#c4c4d8; margin-bottom:4px; }
+  .skill-bar-track { height:4px; background:rgba(255,255,255,0.08); border-radius:2px; }
+  .skill-bar-fill { height:4px; border-radius:2px; background:linear-gradient(90deg,#7c3aed,#4f46e5); width:80%; }
+  .sidebar-text { font-size:0.78rem; color:#c4c4d8; line-height:1.7; }
+  .main-area { flex:1; padding:42px 42px; }
+  .summary-box { background:#f5f3ff; border-left:4px solid #7c3aed; border-radius:0 8px 8px 0; padding:14px 18px; font-size:0.88rem; color:#3c3c5c; line-height:1.7; margin-bottom:30px; }
+  .sec-title { font-size:0.8rem; font-weight:800; text-transform:uppercase; letter-spacing:0.1em; color:#7c3aed; display:flex; align-items:center; gap:10px; margin-bottom:16px; margin-top:28px; }
+  .sec-title:first-child { margin-top:0; }
+  .sec-title::after { content:""; flex:1; height:1.5px; background:#ede9fe; }
+  .content-text { font-size:0.85rem; color:#444; line-height:1.7; }
+  .proj-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .proj-card { border:1.5px solid #ede9fe; border-radius:10px; padding:14px 16px; position:relative; overflow:hidden; }
+  .proj-card::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,#7c3aed,#4f46e5); }
+  .proj-card h4 { font-size:0.9rem; font-weight:700; color:#18181b; margin-bottom:5px; }
+  .proj-card p { font-size:0.78rem; color:#555; line-height:1.5; }
+  .proj-card-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
+  .proj-tag { font-size:0.67rem; font-weight:700; color:#4f46e5; background:#eef2ff; padding:2px 7px; border-radius:4px; }
+
+  /* Fix 3: Download button style */
+  .download-btn {
+    padding: 12px 25px;
+    background: #0d9488;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+  }
+  .download-btn:hover { background: #0f766e; }
+
+  @media print {
+    body { background:#fff; }
+    .page { box-shadow:none; margin:0; }
+    button { display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="accent-bar"></div>
+
+  <div class="sidebar">
+    <div class="avatar">{{ name|slice:":2"|upper }}</div>
+    <h1>{{ name }}</h1>
+    <div class="role-label">{{ resume_title }}</div>
+
+    <div class="side-divider"></div>
+
+    <div class="side-sec-head">Contact</div>
+    <div class="contact-item"><strong>Email</strong>{{ email }}</div>
+    <div class="contact-item"><strong>Phone</strong>{{ phone }}</div>
+    <div class="contact-item"><strong>Location</strong>{{ location }}</div>
+    <div class="contact-item"><strong>LinkedIn</strong>{{ linkedin }}</div>
+    <div class="contact-item"><strong>GitHub</strong>{{ github }}</div>
+
+    {% if show_skills %}
+    <div class="side-divider"></div>
+    <div class="side-sec-head">Core Skills</div>
+    {% for skill in skills %}
+<div class="skill-bar-item">
+    <div class="skill-bar-label">{{ skill }}</div>
+    <div class="skill-bar-track">
+        <div class="skill-bar-fill"></div>
+    </div>
+</div>
+{% endfor %}
+    {% endif %}
+
+    {% if show_education %}
+    <div class="side-divider"></div>
+    <div class="side-sec-head">Education</div>
+    <div class="sidebar-text">{{ education|linebreaksbr }}</div>
+    {% endif %}
+
+    {% if show_languages %}
+    <div class="side-divider"></div>
+    <div class="side-sec-head">Languages</div>
+    <div class="sidebar-text">{{ languages|linebreaksbr }}</div>
+    {% endif %}
+
+  </div>
+
+  <div class="main-area">
+
+    <!-- Fix 2: Download button moved to top-right -->
+    <div style="display:flex; justify-content:flex-end; margin-bottom:20px;">
+      <button onclick="window.print()" class="download-btn">Download PDF</button>
+    </div>
+
+    {% if show_summary %}
+    <div class="summary-box">{{ summary }}</div>
+    {% endif %}
+
+    {% if show_experience %}
+    <div class="sec-title">Work Experience</div>
+    <div class="content-text">{{ experience|linebreaksbr }}</div>
+    {% endif %}
+
+    {% if show_projects %}
+    <div class="sec-title">Projects</div>
+    <div class="proj-grid">
+      {% for project in projects %}
+      <div class="proj-card">
+        <h4>{{ project.name }}</h4>
+        <p>{{ project.description }}</p>
+        <div class="proj-card-tags">
+          <span class="proj-tag">{{ project.stack }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if show_certifications %}
+    <div class="sec-title">Certifications</div>
+    <div class="content-text">{{ certifications|linebreaksbr }}</div>
+    {% endif %}
+
+    {% if show_achievements %}
+    <div class="sec-title">Achievements</div>
+    <div class="content-text">{{ achievements|linebreaksbr }}</div>
+    {% endif %}
+
+  </div>
+</div>
+</body>
+</html>

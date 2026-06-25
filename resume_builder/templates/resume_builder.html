@@ -141,6 +141,52 @@
               </div>
             {% endfor %}
           </div>
+          <h3 class="section-title">Resume Sections</h3>
+
+<div class="row mb-4">
+
+    <div class="col-md-3">
+        <input type="checkbox" name="show_summary" checked>
+        Professional Summary
+    </div>
+
+    <div class="col-md-3">
+        <input type="checkbox" name="show_skills" checked>
+        Skills
+    </div>
+
+    <div class="col-md-3">
+        <input type="checkbox" name="show_education" checked>
+        Education
+    </div>
+
+    <div class="col-md-3">
+        <input type="checkbox" name="show_projects" checked>
+        Projects
+    </div>
+
+    <div class="col-md-3">
+        <input type="checkbox" name="show_experience" checked>
+        Experience
+    </div>
+
+    <div class="col-md-3">
+        <input type="checkbox" name="show_certifications" checked>
+        Certifications
+    </div>
+
+    <div class="col-md-3">
+        <input type="checkbox" name="show_achievements" checked>
+        Achievements
+    </div>
+
+    <div class="col-md-3">
+        <input type="checkbox" name="show_languages" checked>
+        Languages
+    </div>
+
+
+</div>
 
           <hr class="my-5">
 
@@ -184,6 +230,12 @@
             name="location"
             class="form-control mb-3"
             placeholder="Location">
+
+            <input
+    type="text"
+    name="resume_title"
+    class="form-control mb-3"
+    placeholder="Resume Title (e.g. Software Engineer Resume)">
 
           <hr class="my-5">
 
@@ -233,24 +285,35 @@
           </div>
 
           <div id="projects-container" class="mb-4">
-            <div class="project-card mb-3 p-3 border rounded">
-                <input
-                    type="text"
-                    name="project_name[]"
-                    class="form-control mb-2"
-                    placeholder="Project Name">
+           <div class="project-card mb-3 p-3 border rounded">
 
-                <input
-                    type="text"
-                    name="project_stack[]"
-                    class="form-control mb-2"
-                    placeholder="Tech Stack">
+    <div class="text-end mb-2">
+        <button
+            type="button"
+            class="btn btn-danger btn-sm"
+            onclick="this.closest('.project-card').remove()">
+            Remove
+        </button>
+    </div>
 
-                <textarea
-                    name="project_description[]"
-                    class="form-control"
-                    rows="3"
-                    placeholder="Project Description"></textarea>
+    <input
+        type="text"
+        name="project_name[]"
+        class="form-control mb-2"
+        placeholder="Project Name">
+
+    <input
+        type="text"
+        name="project_stack[]"
+        class="form-control mb-2"
+        placeholder="Tech Stack">
+
+    <textarea
+        name="project_description[]"
+        class="form-control"
+        rows="3"
+        placeholder="Project Description"></textarea>
+
             </div>
           </div>
 
@@ -262,6 +325,14 @@
             class="form-control mb-4"
             placeholder="Internships, Work Experience"></textarea>
 
+            <h3 class="section-title">Achievements</h3>
+
+<textarea
+    name="achievements"
+    rows="4"
+    class="form-control mb-4"
+    placeholder="Hackathons, Awards, TCS NQT Score, etc"></textarea>
+
           <h3 class="section-title">Certifications</h3>
 
           <textarea
@@ -270,10 +341,27 @@
             class="form-control mb-5"
             placeholder="AWS, IBM, Cisco, etc"></textarea>
 
+            <h3 class="section-title">Languages</h3>
+
+<input
+    type="text"
+    name="languages"
+    class="form-control mb-4"
+    placeholder="English, Telugu, Hindi">
+
+            <div class="text-center mb-3">
+    
+</div>
+
           <div class="text-center">
-            <button type="submit" class="btn btn-success btn-lg px-5 py-3 fw-bold" style="border-radius: 10px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
-              Generate Resume
-            </button>
+            <button
+    type="submit"
+    name="action"
+    value="download"
+    class="btn btn-success btn-lg px-5 py-3 fw-bold"
+    style="border-radius:10px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);border:none;">
+    Generate Resume
+</button>
           </div>
 
         </form>
@@ -286,25 +374,35 @@
     function addProject(){
         let container = document.getElementById("projects-container");
         let html = `
-        <div class="project-card mb-3 p-3 border rounded">
-            <input
-                type="text"
-                name="project_name[]"
-                class="form-control mb-2"
-                placeholder="Project Name">
+<div class="project-card mb-3 p-3 border rounded">
 
-            <input
-                type="text"
-                name="project_stack[]"
-                class="form-control mb-2"
-                placeholder="Tech Stack">
+    <div class="text-end mb-2">
+        <button
+            type="button"
+            class="btn btn-danger btn-sm"
+            onclick="this.closest('.project-card').remove()">
+            Remove
+        </button>
+    </div>
 
-            <textarea
-                name="project_description[]"
-                class="form-control"
-                rows="3"
-                placeholder="Project Description"></textarea>
-        </div>`;
+    <input
+        type="text"
+        name="project_name[]"
+        class="form-control mb-2"
+        placeholder="Project Name">
+
+    <input
+        type="text"
+        name="project_stack[]"
+        class="form-control mb-2"
+        placeholder="Tech Stack">
+
+    <textarea
+        name="project_description[]"
+        class="form-control"
+        rows="3"
+        placeholder="Project Description"></textarea>
+</div>`;
         container.insertAdjacentHTML("beforeend", html);
     }
   </script>

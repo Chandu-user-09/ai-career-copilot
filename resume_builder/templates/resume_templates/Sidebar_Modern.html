@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Resume - {{ name }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Plus Jakarta Sans', sans-serif;
+    background:#f0f1f3;
+    color:#1c1f2a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .resume-page {
+    max-width: 800px;
+    margin: 24px auto;
+    background:#ffffff;
+    padding: 46px 52px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border-radius: 14px;
+  }
+
+  /* Header */
+  .res-header {
+    display:flex; justify-content:space-between; align-items:flex-end;
+    border-bottom: 3px solid #1c1f2a; padding-bottom:18px; margin-bottom:22px;
+  }
+  .res-header h1 {
+    font-size:2.1rem; font-weight:800; letter-spacing:-0.02em; color:#1c1f2a;
+  }
+  .res-header .role-tag {
+    margin-top:4px; font-size:0.95rem; font-weight:600; color:#d97706;
+    text-transform:uppercase; letter-spacing:0.05em;
+  }
+  .res-contact { text-align:right; font-size:0.8rem; color:#5a6175; line-height:1.6; }
+
+  /* Section */
+  .res-section { margin-bottom:26px; }
+  .res-section h2 {
+    font-size:0.78rem; font-weight:800; text-transform:uppercase; letter-spacing:0.12em;
+    color:#1c1f2a; margin-bottom:14px; position:relative; padding-bottom:8px;
+  }
+  .res-section h2::after {
+    content:""; position:absolute; left:0; bottom:0; width:34px; height:3px; background:#d97706;
+  }
+
+  .summary-text { font-size:0.9rem; color:#3d4252; line-height:1.7; }
+  .content-text { font-size:0.85rem; color:#3d4252; line-height:1.7; }
+
+  .skills-wrap { display:flex; flex-wrap:wrap; gap:8px; }
+  .skill-chip {
+    font-size:0.78rem; font-weight:600; color:#1c1f2a;
+    background:#f4f1ea; border:1px solid #e6e1d4; padding:6px 13px; border-radius:8px;
+  }
+
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+  .proj-entry { margin-bottom:16px; }
+  .proj-entry:last-child { margin-bottom:0; }
+  .proj-name-row { display:flex; justify-content:space-between; align-items:baseline; }
+  .proj-name { font-weight:700; font-size:0.95rem; color:#1c1f2a; }
+  .proj-stack { font-size:0.75rem; color:#d97706; font-weight:700; }
+  .proj-text { font-size:0.85rem; color:#3d4252; line-height:1.6; margin-top:4px; }
+
+  /* Download button */
+  .download-btn {
+    padding: 9px 20px;
+    background: #d97706;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    transition: background 0.2s;
+  }
+  .download-btn:hover { background: #b45309; }
+
+  @media print {
+    body { background:#fff; }
+    .resume-page { box-shadow:none; margin:0; border-radius:0; }
+    button { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="resume-page">
+
+  <!-- HEADER — Download button moved here, top-right -->
+  <div class="res-header">
+    <div>
+      <h1>{{ name }}</h1>
+      <div class="role-tag">{{ resume_title }}</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+      <button onclick="window.print()" class="download-btn">Download PDF</button>
+      <div class="res-contact">
+        {{ email }}<br>
+        {{ phone }} · {{ location }}<br>
+        {{ linkedin }} · {{ github }}
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  {% if show_summary %}
+  <div class="res-section">
+    <h2>Profile Summary</h2>
+    <p class="summary-text">{{ summary }}</p>
+  </div>
+  {% endif %}
+
+  <!-- EXPERIENCE -->
+  {% if show_experience %}
+  <div class="res-section">
+    <h2>Experience</h2>
+    <div class="content-text">{{ experience|linebreaksbr }}</div>
+  </div>
+  {% endif %}
+
+  <!-- PROJECTS — Fix: only show if projects list is also non-empty -->
+  {% if show_projects and projects %}
+  <div class="res-section">
+    <h2>Projects</h2>
+    {% for project in projects %}
+    <div class="proj-entry">
+      <div class="proj-name-row">
+        <span class="proj-name">{{ project.name }}</span>
+        <span class="proj-stack">{{ project.stack }}</span>
+      </div>
+      <div class="proj-text">{{ project.description }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- EDUCATION + SKILLS (two column) -->
+  <div class="two-col">
+
+    {% if show_education %}
+    <div class="res-section">
+      <h2>Education</h2>
+      <div class="content-text">{{ education|linebreaksbr }}</div>
+    </div>
+    {% endif %}
+
+    {% if show_skills %}
+    <div class="res-section">
+      <h2>Skills</h2>
+      <div class="skills-wrap">
+        <!-- Bug fix: skills is now a list from the view, .split() removed -->
+        {% for skill in skills %}
+        <span class="skill-chip">{{ skill }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- CERTIFICATIONS -->
+  {% if show_certifications %}
+  <div class="res-section">
+    <h2>Certifications</h2>
+    <div class="content-text">{{ certifications|linebreaksbr }}</div>
+  </div>
+  {% endif %}
+
+  <!-- ACHIEVEMENTS -->
+  {% if show_achievements %}
+  <div class="res-section">
+    <h2>Achievements</h2>
+    <div class="content-text">{{ achievements|linebreaksbr }}</div>
+  </div>
+  {% endif %}
+
+  <!-- LANGUAGES -->
+  {% if show_languages %}
+  <div class="res-section" style="margin-bottom:0;">
+    <h2>Languages</h2>
+    <div class="content-text">{{ languages|linebreaksbr }}</div>
+  </div>
+  {% endif %}
+
+</div>
+
+</body>
+</html>
