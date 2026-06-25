@@ -93,7 +93,6 @@ WSGI_APPLICATION = 'careercopilot.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-
 import dj_database_url
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -102,7 +101,8 @@ if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.config(
             default=DATABASE_URL,
-            conn_max_age=600
+            conn_max_age=600,
+            engine='django.db.backends.postgresql',
         )
     }
 else:
@@ -112,7 +112,6 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
