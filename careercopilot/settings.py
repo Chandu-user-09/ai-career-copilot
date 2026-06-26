@@ -168,11 +168,21 @@ load_dotenv()
 
 import cloudinary
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+
+
+import cloudinary.uploader
+import cloudinary.api
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dprcae4es',       # your cloud name
-    'API_KEY': '868363885945821',       # paste your API key
-    'API_SECRET': 'VH2YrXGRk6umXLBXJsL3ZzSU3_o', # paste your API secret
+    'CLOUD_NAME': os.environ.get('dprcae4es'),       # your cloud name
+    'API_KEY': os.environ.get('868363885945821'),       # paste your API key
+    'API_SECRET': os.environ.get('VH2YrXGRk6umXLBXJsL3ZzSU3_o'), # paste your API secret
 }
 
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME', 'dprcae4es'),
+    api_key=os.environ.get('868363885945821'),
+    api_secret=os.environ.get('VH2YrXGRk6umXLBXJsL3ZzSU3_o'),
+)
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
