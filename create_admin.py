@@ -1,14 +1,12 @@
 import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'careercopilot.settings')
-
 import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'careercopilot.settings')
 django.setup()
 
 from django.contrib.auth import get_user_model
-User = get_user_model()
 
+User = get_user_model()
 if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-    print("Admin created!")
-else:
-    print("Admin already exists")
+    User.objects.create_superuser('admin', 'admin@example.com', 'YourSecurePassword123!')
+    print("Superuser created successfully!")
