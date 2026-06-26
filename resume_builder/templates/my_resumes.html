@@ -26,9 +26,8 @@
             font-weight: 700;
         }
 
-        /* FIXED: Enhanced visibility for the subtitle */
         .header-subtitle {
-            color: #94a3b8 !important; /* Brighter slate gray for clear contrast */
+            color: #94a3b8 !important;
             font-size: 1.05rem;
             font-weight: 400;
         }
@@ -48,7 +47,6 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(59, 130, 246, 0.15);
         }
 
-        /* Subtle glowing element inside card on hover */
         .resume-card::before {
             content: '';
             position: absolute;
@@ -92,7 +90,6 @@
             text-transform: uppercase;
         }
 
-        /* Premium Buttons Styling */
         .btn-view {
             background-color: transparent;
             color: #94a3b8;
@@ -156,6 +153,8 @@
 </head>
 <body>
 
+{% load static %}
+
 <div class="container py-5">
     
     <div class="dashboard-header d-flex justify-content-between align-items-center">
@@ -199,7 +198,7 @@
                         <a href="/resume-builder/view-resume/{{ resume.id }}/" class="btn btn-view flex-grow-1 flex-md-grow-0">
                             View
                         </a>
-                        <a href="/resume-builder/download-resume/{{ resume.id }}/" class="btn btn-download flex-grow-1 flex-md-grow-0">
+                        <a href="{% static 'resume_templates/' %}{{ resume.file_name }}" class="btn btn-download flex-grow-1 flex-md-grow-0" download>
                             Download PDF
                         </a>
                         <a href="/resume-builder/delete-resume/{{ resume.id }}/" class="btn btn-delete" title="Delete Resume">
