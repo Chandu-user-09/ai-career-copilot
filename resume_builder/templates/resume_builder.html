@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -124,8 +125,9 @@
                 <label class="w-100 m-0">
                   <div class="card template-card shadow">
                     <img
-                      src="{{ template.preview_image.url }}"
-                      class="card-img-top">
+                      src="{% static 'images/' %}{{ template.file_name }}"
+                      class="card-img-top"
+                      alt="{{ template.name }}">
 
                     <div class="card-body text-center">
                       <h5>{{ template.name }}</h5>
@@ -141,101 +143,47 @@
               </div>
             {% endfor %}
           </div>
-          <h3 class="section-title">Resume Sections</h3>
+          
+          <h3 class="section-title mt-4">Resume Sections</h3>
 
-<div class="row mb-4">
-
-    <div class="col-md-3">
-        <input type="checkbox" name="show_summary" checked>
-        Professional Summary
-    </div>
-
-    <div class="col-md-3">
-        <input type="checkbox" name="show_skills" checked>
-        Skills
-    </div>
-
-    <div class="col-md-3">
-        <input type="checkbox" name="show_education" checked>
-        Education
-    </div>
-
-    <div class="col-md-3">
-        <input type="checkbox" name="show_projects" checked>
-        Projects
-    </div>
-
-    <div class="col-md-3">
-        <input type="checkbox" name="show_experience" checked>
-        Experience
-    </div>
-
-    <div class="col-md-3">
-        <input type="checkbox" name="show_certifications" checked>
-        Certifications
-    </div>
-
-    <div class="col-md-3">
-        <input type="checkbox" name="show_achievements" checked>
-        Achievements
-    </div>
-
-    <div class="col-md-3">
-        <input type="checkbox" name="show_languages" checked>
-        Languages
-    </div>
-
-
-</div>
+          <div class="row mb-4">
+            <div class="col-md-3 mb-2">
+                <input type="checkbox" name="show_summary" checked> Professional Summary
+            </div>
+            <div class="col-md-3 mb-2">
+                <input type="checkbox" name="show_skills" checked> Skills
+            </div>
+            <div class="col-md-3 mb-2">
+                <input type="checkbox" name="show_education" checked> Education
+            </div>
+            <div class="col-md-3 mb-2">
+                <input type="checkbox" name="show_projects" checked> Projects
+            </div>
+            <div class="col-md-3 mb-2">
+                <input type="checkbox" name="show_experience" checked> Experience
+            </div>
+            <div class="col-md-3 mb-2">
+                <input type="checkbox" name="show_certifications" checked> Certifications
+            </div>
+            <div class="col-md-3 mb-2">
+                <input type="checkbox" name="show_achievements" checked> Achievements
+            </div>
+            <div class="col-md-3 mb-2">
+                <input type="checkbox" name="show_languages" checked> Languages
+            </div>
+          </div>
 
           <hr class="my-5">
 
           <h3 class="section-title">Personal Information</h3>
 
-          <input
-            type="text"
-            name="name"
-            class="form-control mb-3"
-            placeholder="Full Name"
-            required>
-
-          <input
-            type="email"
-            name="email"
-            class="form-control mb-3"
-            placeholder="Email Address"
-            required>
-
-          <input
-            type="text"
-            name="phone"
-            class="form-control mb-3"
-            placeholder="Phone Number"
-            required>
-
-          <input
-            type="text"
-            name="linkedin"
-            class="form-control mb-3"
-            placeholder="LinkedIn URL">
-
-          <input
-            type="text"
-            name="github"
-            class="form-control mb-3"
-            placeholder="GitHub URL">
-
-          <input
-            type="text"
-            name="location"
-            class="form-control mb-3"
-            placeholder="Location">
-
-            <input
-    type="text"
-    name="resume_title"
-    class="form-control mb-3"
-    placeholder="Resume Title (e.g. Software Engineer Resume)">
+          <input type="text" name="name" class="form-control mb-3" placeholder="Full Name" required>
+          <input type="email" name="email" class="form-control mb-3" placeholder="Email Address" required>
+          <input type="text" name="phone" class="form-control mb-3" placeholder="Phone Number" required>
+          <input type="text" name="linkedin" class="form-control mb-3" placeholder="LinkedIn URL">
+          <input type="text" name="github" class="form-control mb-3" placeholder="GitHub URL">
+          <input type="text" name="location" class="form-control mb-3" placeholder="Location">
+          <input type="text" name="resume_title" class="form-control mb-3" placeholder="Resume Title (e.g. Software Engineer Resume)">
 
           <hr class="my-5">
 
@@ -250,28 +198,13 @@
             </button>
           </div>
 
-          <textarea
-            id="summary"
-            name="summary"
-            rows="5"
-            class="form-control mb-4"
-            placeholder="Write a short professional summary"></textarea>
+          <textarea id="summary" name="summary" rows="5" class="form-control mb-4" placeholder="Write a short professional summary"></textarea>
 
           <h3 class="section-title">Skills</h3>
-
-          <textarea
-            name="skills"
-            rows="4"
-            class="form-control mb-4"
-            placeholder="Python, SQL, Power BI, React, Django..."></textarea>
+          <textarea name="skills" rows="4" class="form-control mb-4" placeholder="Python, SQL, Power BI, React, Django..."></textarea>
 
           <h3 class="section-title">Education</h3>
-
-          <textarea
-            name="education"
-            rows="5"
-            class="form-control mb-4"
-            placeholder="Degree, College, CGPA, Year"></textarea>
+          <textarea name="education" rows="5" class="form-control mb-4" placeholder="Degree, College, CGPA, Year"></textarea>
 
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 class="section-title mb-0">Projects</h3>
@@ -285,85 +218,38 @@
           </div>
 
           <div id="projects-container" class="mb-4">
-           <div class="project-card mb-3 p-3 border rounded">
-
-    <div class="text-end mb-2">
-        <button
-            type="button"
-            class="btn btn-danger btn-sm"
-            onclick="this.closest('.project-card').remove()">
-            Remove
-        </button>
-    </div>
-
-    <input
-        type="text"
-        name="project_name[]"
-        class="form-control mb-2"
-        placeholder="Project Name">
-
-    <input
-        type="text"
-        name="project_stack[]"
-        class="form-control mb-2"
-        placeholder="Tech Stack">
-
-    <textarea
-        name="project_description[]"
-        class="form-control"
-        rows="3"
-        placeholder="Project Description"></textarea>
-
+            <div class="project-card mb-3 p-3 border rounded">
+              <div class="text-end mb-2">
+                <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.project-card').remove()">Remove</button>
+              </div>
+              <input type="text" name="project_name[]" class="form-control mb-2" placeholder="Project Name">
+              <input type="text" name="project_stack[]" class="form-control mb-2" placeholder="Tech Stack">
+              <textarea name="project_description[]" class="form-control" rows="3" placeholder="Project Description"></textarea>
             </div>
           </div>
 
           <h3 class="section-title">Experience</h3>
+          <textarea name="experience" rows="5" class="form-control mb-4" placeholder="Internships, Work Experience"></textarea>
 
-          <textarea
-            name="experience"
-            rows="5"
-            class="form-control mb-4"
-            placeholder="Internships, Work Experience"></textarea>
-
-            <h3 class="section-title">Achievements</h3>
-
-<textarea
-    name="achievements"
-    rows="4"
-    class="form-control mb-4"
-    placeholder="Hackathons, Awards, TCS NQT Score, etc"></textarea>
+          <h3 class="section-title">Achievements</h3>
+          <textarea name="achievements" rows="4" class="form-control mb-4" placeholder="Hackathons, Awards, TCS NQT Score, etc"></textarea>
 
           <h3 class="section-title">Certifications</h3>
+          <textarea name="certifications" rows="4" class="form-control mb-5" placeholder="AWS, IBM, Cisco, etc"></textarea>
 
-          <textarea
-            name="certifications"
-            rows="4"
-            class="form-control mb-5"
-            placeholder="AWS, IBM, Cisco, etc"></textarea>
-
-            <h3 class="section-title">Languages</h3>
-
-<input
-    type="text"
-    name="languages"
-    class="form-control mb-4"
-    placeholder="English, Telugu, Hindi">
-
-            <div class="text-center mb-3">
-    
-</div>
+          <h3 class="section-title">Languages</h3>
+          <input type="text" name="languages" class="form-control mb-4" placeholder="English, Telugu, Hindi">
 
           <div class="text-center">
             <button
-    type="submit"
-    name="action"
-    value="download"
-    class="btn btn-success btn-lg px-5 py-3 fw-bold"
-    style="border-radius:10px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);border:none;">
-    Generate Resume
-</button>
+              type="submit"
+              name="action"
+              value="download"
+              class="btn btn-success btn-lg px-5 py-3 fw-bold"
+              style="border-radius:10px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);border:none;">
+              Generate Resume
+            </button>
           </div>
-
         </form>
 
       </div>
@@ -375,33 +261,12 @@
         let container = document.getElementById("projects-container");
         let html = `
 <div class="project-card mb-3 p-3 border rounded">
-
     <div class="text-end mb-2">
-        <button
-            type="button"
-            class="btn btn-danger btn-sm"
-            onclick="this.closest('.project-card').remove()">
-            Remove
-        </button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.project-card').remove()">Remove</button>
     </div>
-
-    <input
-        type="text"
-        name="project_name[]"
-        class="form-control mb-2"
-        placeholder="Project Name">
-
-    <input
-        type="text"
-        name="project_stack[]"
-        class="form-control mb-2"
-        placeholder="Tech Stack">
-
-    <textarea
-        name="project_description[]"
-        class="form-control"
-        rows="3"
-        placeholder="Project Description"></textarea>
+    <input type="text" name="project_name[]" class="form-control mb-2" placeholder="Project Name">
+    <input type="text" name="project_stack[]" class="form-control mb-2" placeholder="Tech Stack">
+    <textarea name="project_description[]" class="form-control" rows="3" placeholder="Project Description"></textarea>
 </div>`;
         container.insertAdjacentHTML("beforeend", html);
     }
@@ -410,7 +275,6 @@
   <script>
     async function generateSummary(){
         let skills = document.querySelector('[name="skills"]').value;
-        let projects = document.querySelector('[name="projects"]')?.value || "";
         let experience = document.querySelector('[name="experience"]').value;
 
         let response = await fetch(
@@ -422,9 +286,8 @@
                     "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
                 },
                 body:JSON.stringify({
-                    skills:skills,
-                    projects:projects,
-                    experience:experience
+                    skills: skills,
+                    experience: experience
                 })
             }
         );

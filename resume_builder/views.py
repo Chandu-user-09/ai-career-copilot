@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
-from reportlab.pdfgen import canvas
 import json
 
 import google.generativeai as genai
@@ -10,61 +9,58 @@ from .models import ResumeTemplate, UserResume
 
 
 def resume_builder(request):
-
     templates = ResumeTemplate.objects.all()
 
     if request.method == "POST":
-
         template_id = request.POST.get("selected_template")
         selected_template = ResumeTemplate.objects.get(id=template_id)
 
-        # Section visibility
-        show_summary        = request.POST.get("show_summary")
-        show_skills         = request.POST.get("show_skills")
-        show_education      = request.POST.get("show_education")
-        show_projects       = request.POST.get("show_projects")
-        show_experience     = request.POST.get("show_experience")
-        show_certifications = request.POST.get("show_certifications")
-        show_achievements   = request.POST.get("show_achievements")
-        show_languages      = request.POST.get("show_languages")
+        # Section visibility toggles
+        show_summary        = request.POST.get("show_summary") == "on" or request.POST.get("show_summary") == "true" or request.POST.get("show_summary") is not None
+        show_skills         = request.POST.get("show_skills") is not None
+        show_education      = request.POST.get("show_education") is not None
+        show_projects       = request.POST.get("show_projects") is not None
+        show_experience     = request.POST.get("show_experience") is not None
+        show_certifications = request.POST.get("show_certifications") is not None
+        show_achievements   = request.POST.get("show_achievements") is not None
+        show_languages      = request.POST.get("show_languages") is not None
 
         # ATS checkbox
-        ats_optimized = request.POST.get("ats_optimized")
+        ats_optimized = request.POST.get("ats_optimized") is not None
 
-        # Projects
+        # Gather dynamic project arrays
         project_names        = request.POST.getlist("project_name[]")
         project_stacks       = request.POST.getlist("project_stack[]")
         project_descriptions = request.POST.getlist("project_description[]")
 
         projects = []
         for i in range(len(project_names)):
-            projects.append({
-                "name":        project_names[i],
-                "stack":       project_stacks[i],
-                "description": project_descriptions[i],
-            })
+            if project_names[i].strip(): # Only pack if name isn't empty
+                projects.append({
+                    "name":        project_names[i],
+                    "stack":       project_stacks[i] if i < len(project_stacks) else "",
+                    "description": project_descriptions[i] if i < len(project_descriptions) else "",
+                })
 
-        # Bug fix: split skills by comma into a list so {% for skill in skills %} works
+        # Process skills block cleanly into individual loop elements
         raw_skills = request.POST.get("skills", "")
         skills_list = [s.strip() for s in raw_skills.split(",") if s.strip()]
 
-        # Improvement 2: compute proper initials (e.g. "Chandra Prakash" → "CP")
+        # Generate character initials safely
         name = request.POST.get("name", "")
-        initials = "".join(
-            word[0] for word in name.split() if word
-        )[:2].upper()
+        initials = "".join(word[0] for word in name.split() if word)[:2].upper()
 
         context = {
-            "resume_title":        request.POST.get("resume_title"),
+            "resume_title":        request.POST.get("resume_title") or "Professional Resume",
             "name":                name,
-            "initials":            initials,        # ← proper initials
+            "initials":            initials,
             "email":               request.POST.get("email"),
             "phone":               request.POST.get("phone"),
             "linkedin":            request.POST.get("linkedin"),
             "github":              request.POST.get("github"),
             "location":            request.POST.get("location"),
             "summary":             request.POST.get("summary"),
-            "skills":              skills_list,     # ← proper list
+            "skills":              skills_list,
             "education":           request.POST.get("education"),
             "projects":            projects,
             "experience":          request.POST.get("experience"),
@@ -82,6 +78,7 @@ def resume_builder(request):
             "ats_optimized":       ats_optimized,
         }
 
+        # Persist to database if authenticated
         if request.user.is_authenticated:
             UserResume.objects.create(
                 user=request.user,
@@ -96,34 +93,8 @@ def resume_builder(request):
             context,
         )
 
-    # GET request
+    # GET request execution loop
     return render(request, "resume_builder.html", {"templates": templates})
-
-
-def download_resume(request):
-    name      = request.POST.get("name", "")
-    email     = request.POST.get("email", "")
-    phone     = request.POST.get("phone", "")
-    skills    = request.POST.get("skills", "")
-    education = request.POST.get("education", "")
-    projects  = request.POST.get("projects", "")
-
-    response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = 'attachment; filename="resume.pdf"'
-
-    pdf = canvas.Canvas(response)
-    pdf.setFont("Helvetica-Bold", 18)
-    pdf.drawString(100, 800, name)
-    pdf.setFont("Helvetica", 12)
-    pdf.drawString(100, 770, f"{email} | {phone}")
-    pdf.drawString(100, 720, "Skills:")
-    pdf.drawString(100, 700, skills)
-    pdf.drawString(100, 650, "Education:")
-    pdf.drawString(100, 630, education)
-    pdf.drawString(100, 580, "Projects:")
-    pdf.drawString(100, 560, projects)
-    pdf.save()
-    return response
 
 
 def generate_summary(request):
@@ -145,19 +116,17 @@ Projects:
 Experience:
 {experience}
 
-Write 4 lines.
-Professional and ATS friendly.
+Write exactly 4 lines.
+Keep it crisp, professional, and ATS friendly. Do not output anything other than the summary text.
 """
         model    = genai.GenerativeModel("gemini-2.5-flash")
         response = model.generate_content(prompt)
-        return JsonResponse({"summary": response.text})
+        return JsonResponse({"summary": response.text.strip()})
 
 
 @login_required
 def my_resumes(request):
-    resumes = UserResume.objects.filter(
-        user=request.user
-    ).order_by("-created_at")
+    resumes = UserResume.objects.filter(user=request.user).order_by("-created_at")
     return render(request, "my_resumes.html", {"resumes": resumes})
 
 

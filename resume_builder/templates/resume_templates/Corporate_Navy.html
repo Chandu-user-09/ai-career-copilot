@@ -11,10 +11,11 @@
   body { font-family:'Source Sans 3', sans-serif; background:#e8edf2; color:#111827; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   .page { max-width:860px; margin:28px auto; background:#ffffff; box-shadow:0 8px 40px rgba(0,0,0,0.12); overflow:hidden; }
   .banner { background:#0f2044; padding:36px 48px; display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; }
-  .banner-left h1 { font-family:'Playfair Display', serif; font-size:2.4rem; color:#ffffff; letter-spacing:-0.01em; line-height:1.1; }
+  .banner-left { flex: 1; min-width: 280px; }
+  .banner-left h1 { font-family:'Playfair Display', serif; font-size:2.4rem; color:#ffffff; letter-spacing:-0.01em; line-height:1.1; word-break: break-word; }
   .banner-left .role { font-size:0.88rem; color:#7ba3d4; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; margin-top:6px; }
   .banner-right { text-align:right; }
-  .banner-right .contact-row { font-size:0.82rem; color:#a8c4e0; line-height:1.8; display:flex; align-items:center; justify-content:flex-end; gap:6px; }
+  .banner-right .contact-row { font-size:0.82rem; color:#a8c4e0; line-height:1.8; display:flex; align-items:center; justify-content:flex-end; gap:6px; word-break: break-all; }
   .banner-right .contact-row span { color:#4a8fc2; font-size:0.75rem; }
   .summary-strip { background:#f0f5fb; border-left:5px solid #1e4e8c; padding:18px 48px; font-size:0.9rem; color:#374151; line-height:1.7; }
   .body { display:grid; grid-template-columns:1fr 240px; }
@@ -24,7 +25,7 @@
   .sec-head::before { content:""; width:18px; height:3px; background:#1e4e8c; border-radius:2px; display:block; flex-shrink:0; }
   .sec-head::after { content:""; flex:1; height:1px; background:#dde4ef; }
   .content-text { font-size:0.85rem; color:#374151; line-height:1.7; }
-  .proj-row { display:flex; gap:6px; margin-bottom:14px; align-items:flex-start; }
+  .proj-row { display:flex; gap:12px; margin-bottom:18px; align-items:flex-start; }
   .proj-num { min-width:24px; height:24px; background:#0f2044; color:#ffffff; font-size:0.7rem; font-weight:700; border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
   .proj-title { font-size:0.9rem; font-weight:700; color:#111827; }
   .proj-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:4px; }
@@ -33,66 +34,68 @@
   .sidebar { padding:34px 28px; background:#f8f9fc; }
   .side-sec { margin-bottom:24px; }
   .side-head { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:#1e4e8c; margin-bottom:12px; padding-bottom:6px; border-bottom:2px solid #1e4e8c; }
-  .skill-pills { display:flex; flex-wrap:wrap; gap:4px; }
+  .skill-pills { display:flex; flex-wrap:wrap; gap:6px; }
   .skill-pill { font-size:0.71rem; color:#1e4e8c; background:#dde9f8; border:1px solid #bdd0f0; padding:3px 8px; border-radius:4px; font-weight:600; }
   .sidebar-text { font-size:0.8rem; color:#374151; line-height:1.7; }
 
-  /* Download button */
+  /* Download Button Styling */
   .download-btn {
-    padding: 10px 20px;
+    padding: 10px 18px;
     background: #1e4e8c;
     color: white;
-    border: none;
-    border-radius: 8px;
+    border: 1px solid #2e5e9c;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 0.88rem;
+    font-size: 0.8rem;
     font-family: 'Source Sans 3', sans-serif;
     font-weight: 600;
-    transition: background 0.2s;
+    transition: all 0.2s;
   }
   .download-btn:hover { background: #163a6b; }
 
   @media print {
-    body { background:#fff; }
-    .page { box-shadow:none; margin:0; }
-    button { display:none; }
+    @page {
+      size: A4 portrait;
+      margin: 0; /* Cleans up native browser headers/footers */
+    }
+    body { background:#fff; margin: 0; padding: 0; }
+    .page { box-shadow:none; margin:0; width: 100%; max-width: 100%; border-radius: 0; }
+    .download-wrapper { display:none !important; } /* Clean removal during printing */
   }
 </style>
 </head>
 <body>
 <div class="page">
 
-  <!-- Download button moved to top-right of banner -->
   <div class="banner">
     <div class="banner-left">
       <h1>{{ name }}</h1>
       <div class="role">{{ resume_title }}</div>
     </div>
     <div class="banner-right">
-      <div style="margin-bottom:12px;">
+      <div class="download-wrapper" style="margin-bottom:12px;">
         <button onclick="window.print()" class="download-btn">Download PDF</button>
       </div>
       <div class="contact-row"><span>✉</span> {{ email }}</div>
       <div class="contact-row"><span>📱</span> {{ phone }}</div>
       <div class="contact-row"><span>📍</span> {{ location }}</div>
-      <div class="contact-row"><span>🔗</span> {{ linkedin }}</div>
-      <div class="contact-row"><span>💻</span> {{ github }}</div>
+      {% if linkedin %}<div class="contact-row"><span>🔗</span> {{ linkedin }}</div>{% endif %}
+      {% if github %}<div class="contact-row"><span>💻</span> {{ github }}</div>{% endif %}
     </div>
   </div>
 
-  {% if show_summary %}
+  {% if show_summary and summary %}
   <div class="summary-strip">{{ summary }}</div>
   {% endif %}
 
   <div class="body">
     <div class="main">
 
-      {% if show_experience %}
+      {% if show_experience and experience %}
       <div class="sec-head">Work Experience</div>
       <div class="content-text">{{ experience|linebreaksbr }}</div>
       {% endif %}
 
-      <!-- Fix: only render section if projects list is also non-empty -->
       {% if show_projects and projects %}
       <div class="sec-head">Projects</div>
       {% for project in projects %}
@@ -100,14 +103,16 @@
         <div class="proj-num">{{ forloop.counter|stringformat:"02d" }}</div>
         <div>
           <div class="proj-title">{{ project.name }}</div>
+          {% if project.stack %}
           <div class="proj-tags"><span class="proj-tag">{{ project.stack }}</span></div>
+          {% endif %}
           <div class="proj-desc">{{ project.description }}</div>
         </div>
       </div>
       {% endfor %}
       {% endif %}
 
-      {% if show_achievements %}
+      {% if show_achievements and achievements %}
       <div class="sec-head">Achievements</div>
       <div class="content-text">{{ achievements|linebreaksbr }}</div>
       {% endif %}
@@ -116,18 +121,17 @@
 
     <div class="sidebar">
 
-      {% if show_education %}
+      {% if show_education and education %}
       <div class="side-sec">
         <div class="side-head">Education</div>
         <div class="sidebar-text">{{ education|linebreaksbr }}</div>
       </div>
       {% endif %}
 
-      {% if show_skills %}
+      {% if show_skills and skills %}
       <div class="side-sec">
         <div class="side-head">Skills</div>
         <div class="skill-pills">
-          <!-- Bug fix: skills is now a list from the view, .split() removed -->
           {% for skill in skills %}
           <span class="skill-pill">{{ skill }}</span>
           {% endfor %}
@@ -135,14 +139,14 @@
       </div>
       {% endif %}
 
-      {% if show_certifications %}
+      {% if show_certifications and certifications %}
       <div class="side-sec">
         <div class="side-head">Certifications</div>
         <div class="sidebar-text">{{ certifications|linebreaksbr }}</div>
       </div>
       {% endif %}
 
-      {% if show_languages %}
+      {% if show_languages and languages %}
       <div class="side-sec">
         <div class="side-head">Languages</div>
         <div class="sidebar-text">{{ languages|linebreaksbr }}</div>

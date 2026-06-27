@@ -143,13 +143,15 @@ cloudinary.config(
 )
 
 # Consolidated Storage Handlers for Modern Django
+# Consolidated Storage Handlers for Modern Django
 STORAGES = {
     "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        "BACKEND": "cloudinary_storage.storage.RawMediaCloudinaryStorage",  # 💻 FIX: Changed to RawMedia for PDFs
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage", # 💻 FIX: Optimized for Render deployments
     },
 }
 
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+# Ensure standard legacy fallback matches your static backend
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
