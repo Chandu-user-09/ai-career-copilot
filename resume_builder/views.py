@@ -13,7 +13,18 @@ def resume_builder(request):
 
     if request.method == "POST":
         template_id = request.POST.get("selected_template")
-        selected_template = ResumeTemplate.objects.get(id=template_id)
+        
+        # 💻 FIX: Safe fallback configuration to stop 500 crashes
+        try:
+            if template_id:
+                selected_template = ResumeTemplate.objects.get(id=template_id)
+            else:
+                selected_template = templates.first()
+        except (ResumeTemplate.DoesNotExist, ValueError):
+            selected_template = templates.first()
+
+        if not selected_template:
+            return HttpResponse("Please add at least one template in Django Admin first.", status=400)
 
         # Section visibility toggles
         show_summary        = request.POST.get("show_summary") == "on" or request.POST.get("show_summary") == "true" or request.POST.get("show_summary") is not None
